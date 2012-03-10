@@ -41,6 +41,7 @@ static int galaxys2_usb_init(void);
 static void blink_led(unsigned times) {
 	struct pmic *p = get_pmic();
 	if (pmic_probe(p)) {
+		printf("failed to get pmic\n");
 		return;
 	}
 
@@ -187,10 +188,10 @@ int board_mmc_init(bd_t *bis)
 {
 	int i, err;
 
-	//err = galaxys2_init_emmc();
-	//if (err) {
-	//	printf("failed to initialize emmc\n");
-	//}
+	err = galaxys2_init_emmc();
+	if (err) {
+		printf("failed to initialize emmc\n");
+	}
 	
 	microsd_power_enable();
 
