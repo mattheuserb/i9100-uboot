@@ -35,10 +35,10 @@
 
 #define CONFIG_ARCH_CPU_INIT
 #define CONFIG_DISPLAY_CPUINFO
-#define CONFIG_DISPLAY_BOARDINFO
+#define CONFIG_DISPLAY_BOARDINFO_LATE
 
 /* Keep L2 Cache Disabled */
-#define CONFIG_L2_OFF			1
+#define CONFIG_SYS_L2CACHE_OFF		1
 #define CONFIG_SYS_DCACHE_OFF		1
 
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
@@ -52,6 +52,14 @@
 #define CONFIG_INITRD_TAG
 #define CONFIG_CMDLINE_EDITING
 //#define CONFIG_SKIP_LOWLEVEL_INIT
+
+#define CONFIG_VIDEO
+#define CONFIG_CFB_CONSOLE
+#define CONFIG_VGA_AS_SINGLE_DEVICE
+
+#define CONFIG_STD_DEVICES_SETTINGS "stdin=serial\0" \
+									"stdout=serial,lcd\0" \
+									"stderr=serial,lcd\0"
 
 #define CONFIG_MACH_TYPE		MACH_TYPE_GALAXYS2
 
@@ -88,16 +96,68 @@
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_MMC
 #define CONFIG_CMD_FAT
+#define CONFIG_CMD_EXT2
 #undef CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 
-#define CONFIG_BOOTDELAY		3
+#define CONFIG_BOOTDELAY		1
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-/* MMC SPL */
-//#define CONFIG_SPL
-//#define COPY_BL2_FNPTR_ADDR	0x02020030
+#define CONFIG_BOOTCOMMAND	"run galaxy_boot"
 
-#define CONFIG_BOOTCOMMAND	"fatload mmc 0 40007000 uImage; bootm 40007000"
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	\
+	"kernel_name=/boot/vmlinux.uimg\0"\
+	"script_img=/boot/boot.scr.uimg\0"\
+	\
+	"run_disk_boot_script=" \
+		"if ext2load ${devtype} ${devnum}:${script_part} " \
+				"${loadaddr} ${script_img}; then " \
+			"source ${loadaddr}; " \
+		"elif fatload ${devtype} ${devnum}:${script_part} " \
+				"${loadaddr} ${script_img}; then " \
+			"source ${loadaddr}; " \
+		"fi\0" \
+	\
+	"real_boot="\
+		"setenv bootargs "\
+			"${dev_extras} root=/dev/${devname}${rootpart} rootwait ro"\
+		"echo Load Address:${loadaddr};" \
+		"echo Cmdline:${bootargs}; " \
+		"if ext2load ${devtype} ${devnum}:${kernel_part} " \
+		            "${loadaddr} ${kernel_name}; then " \
+			"bootm ${loadaddr};" \
+		"elif fatload ${devtype} ${devnum}:${kernel_part} " \
+		            "${loadaddr} ${kernel_name}; then " \
+			"bootm ${loadaddr};" \
+		"else" \
+			"reset; " \
+		"fi\0" \
+	\
+	"mmc_boot=mmc rescan ${devnum}; " \
+		"setenv devtype mmc; " \
+		"setenv devname mmcblk${devnum}p; " \
+		"run run_disk_boot_script; " \
+		"run real_boot\0" \
+	\
+	"emmc_boot=setenv devnum 0; " \
+		"setenv script_part 8; " \
+		"setenv kernel_part 8; " \
+		"setenv rootpart 3; " \
+		"run mmc_boot\0" \
+	\
+	"microsd_boot=setenv devnum 0; " \
+		"setenv script_part 1; " \
+		"setenv kernel_part 1; " \
+		"setenv rootpart 2; " \
+		"run mmc_boot\0" \
+	\
+	"galaxy_boot=" \
+		"setenv loadaddr 0x43008000; "\
+		"setenv dev_extras console=tty0 --no-log lpj=3981312; "\
+		"run microsd_boot; "
+		
+		//"run emmc_boot;\0"
+
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
@@ -107,7 +167,9 @@
 #define CONFIG_SYS_CBSIZE		256	/* Console I/O Buffer Size*/
 #define CONFIG_SYS_PBSIZE		384	/* Print Buffer Size */
 #define CONFIG_SYS_MAXARGS		16	/* max number of command args */
-#define CONFIG_DEFAULT_CONSOLE		"console=ttySAC2,115200n8\0"
+//#define CONFIG_DEFAULT_CONSOLE		"console=ttySAC2,115200n8\0"
+#define CONFIG_DEFAULT_CONSOLE		"console=tty0\0"
+
 /* Boot Argument Buffer Size */
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 /* memtest works on */
@@ -150,15 +212,13 @@
 /* MIU (Memory Interleaving Unit) */
 #define CONFIG_MIU_2BIT_21_7_INTERLEAVED
 
-#define CONFIG_ENV_IS_IN_MMC		1
-#define CONFIG_SYS_MMC_ENV_DEV		0
+#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE			(16 << 10)	/* 16 KB */
-#define RESERVE_BLOCK_SIZE		(512)
-#define BL1_SIZE			(16 << 10) /*16 K reserved for BL1*/
-#define CONFIG_ENV_OFFSET		(RESERVE_BLOCK_SIZE + BL1_SIZE)
+
 #define CONFIG_DOS_PARTITION		1
 
 #define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR - GENERATED_GBL_DATA_SIZE)
+#define CONFIG_SYS_CACHELINE_SIZE       32
 
 /* U-boot copy size from boot Media to DRAM.*/
 #define COPY_BL2_SIZE		0x80000
@@ -180,5 +240,9 @@
 #define CONFIG_PMIC
 #define CONFIG_PMIC_I2C
 #define CONFIG_PMIC_MAX8997
+
+#define CONFIG_USB_GADGET
+#define CONFIG_USB_GADGET_S3C_UDC_OTG
+#define CONFIG_USB_GADGET_DUALSPEED
 
 #endif	/* __CONFIG_H */
