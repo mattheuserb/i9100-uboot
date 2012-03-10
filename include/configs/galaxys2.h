@@ -100,6 +100,9 @@
 #undef CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 
+#define CONFIG_DOS_PARTITION		1
+#define CONFIG_EFI_PARTITION		1
+
 #define CONFIG_BOOTDELAY		1
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_BOOTCOMMAND	"run galaxy_boot"
@@ -120,7 +123,7 @@
 	\
 	"real_boot="\
 		"setenv bootargs "\
-			"${dev_extras} root=/dev/${devname}${rootpart} rootwait ro"\
+			"${dev_extras} root=/dev/${devname}${rootpart} rootwait ro ;"\
 		"echo Load Address:${loadaddr};" \
 		"echo Cmdline:${bootargs}; " \
 		"if ext2load ${devtype} ${devnum}:${kernel_part} " \
@@ -129,23 +132,23 @@
 		"elif fatload ${devtype} ${devnum}:${kernel_part} " \
 		            "${loadaddr} ${kernel_name}; then " \
 			"bootm ${loadaddr};" \
-		"else" \
-			"reset; " \
 		"fi\0" \
 	\
-	"mmc_boot=mmc rescan ${devnum}; " \
+	"mmc_boot=mmc rescan; " \
 		"setenv devtype mmc; " \
 		"setenv devname mmcblk${devnum}p; " \
 		"run run_disk_boot_script; " \
 		"run real_boot\0" \
 	\
 	"emmc_boot=setenv devnum 0; " \
+		"echo Booting from EMMC; "\
 		"setenv script_part 8; " \
 		"setenv kernel_part 8; " \
 		"setenv rootpart 3; " \
 		"run mmc_boot\0" \
 	\
-	"microsd_boot=setenv devnum 0; " \
+	"microsd_boot=setenv devnum 1; " \
+		"echo Booting from uSD; "\
 		"setenv script_part 1; " \
 		"setenv kernel_part 1; " \
 		"setenv rootpart 2; " \
@@ -154,9 +157,8 @@
 	"galaxy_boot=" \
 		"setenv loadaddr 0x43008000; "\
 		"setenv dev_extras console=tty0 --no-log lpj=3981312; "\
-		"run microsd_boot; "
-		
-		//"run emmc_boot;\0"
+		"run microsd_boot; " \
+		"run emmc_boot;\0"
 
 
 /* Miscellaneous configurable options */
@@ -214,8 +216,6 @@
 
 #define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE			(16 << 10)	/* 16 KB */
-
-#define CONFIG_DOS_PARTITION		1
 
 #define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_CACHELINE_SIZE       32

@@ -69,14 +69,23 @@ static void blink_led(unsigned times) {
 }
 
 static void microsd_power_enable(void) {
+	u32 ctrl;
 	struct pmic *p = get_pmic();
 	if (pmic_probe(p)) {
 		printf("failed to get pmic\n");
 		return;
 	}
+
+	unsigned vmask = ((1 << 7) - 1);
 	
-	pmic_set_output(p, MAX8997_REG_LDO17CTRL,
-		MAX8997_MASK_LDO, LDO_ON);
+	//set to 3.3V
+	pmic_reg_read(p, MAX8997_REG_LDO17CTRL, &ctrl);
+	ctrl &= ~vmask;
+	ctrl |= 50;
+	ctrl |= MAX8997_MASK_LDO;
+	pmic_reg_write(p, MAX8997_REG_LDO17CTRL, ctrl);
+	
+	mdelay(50);
 }
 
 int board_init(void)
@@ -87,7 +96,10 @@ int board_init(void)
 	gd->bd->bi_boot_params = (PHYS_SDRAM_1 + 0x100UL);
 	
 	pmic_init();
+
+#ifndef CONFIG_VIDEO
 	blink_led(1);
+#endif
 	
 	if (galaxys2_usb_init()) {
 		printf("failed to initialize usb\n");
@@ -193,34 +205,44 @@ int board_mmc_init(bd_t *bis)
 		printf("failed to initialize emmc\n");
 	}
 	
-	microsd_power_enable();
+	/* T-flash detect */
+	s5p_gpio_cfg_pin(&gpio2->x3, 4, 0xf);
+	s5p_gpio_set_pull(&gpio2->x3, 4, GPIO_PULL_UP);
 
-	/*
-	 * MMC2 SD card GPIO:
-	 *
-	 * GPK2[0]	SD_2_CLK(2)
-	 * GPK2[1]	SD_2_CMD(2)
-	 * GPK2[2]	SD_2_CDn
-	 * GPK2[3:6]	SD_2_DATA[0:3](2)
-	 */
-	for (i = 0; i < 7; i++) {
-		/* GPK2[0:6] special function 2 */
-		s5p_gpio_cfg_pin(&gpio2->k2, i, GPIO_FUNC(0x2));
+	if (!s5p_gpio_get_value(&gpio2->x3, 4)) {
+		printf("enabling uSD\n");
+		microsd_power_enable();
 
-		/* GPK2[0:6] drv 4x */
-		s5p_gpio_set_drv(&gpio2->k2, i, GPIO_DRV_4X);
+		/*
+		 * MMC2 SD card GPIO:
+		 *
+		 * GPK2[0]	SD_2_CLK(2)
+		 * GPK2[1]	SD_2_CMD(2)
+		 * GPK2[2]	SD_2_CDn -> Not used
+		 * GPK2[3:6]	SD_2_DATA[0:3](2)
+		 */
+		for (i = 0; i < 7; i++) {
+			if (i == 2)
+				continue;
+			/* GPK2[0:6] special function 2 */
+			s5p_gpio_cfg_pin(&gpio2->k2, i, GPIO_FUNC(0x2));
 
-		/* GPK2[0:1] pull disable */
-		if (i == 0 || i == 1) {
-			s5p_gpio_set_pull(&gpio2->k2, i, GPIO_PULL_NONE);
-			continue;
+			if (i < 2) {
+				/* GPK2[0:1] pull disable */
+				s5p_gpio_set_pull(&gpio2->k2, i, GPIO_PULL_NONE);
+			}
+			else {
+				/* GPK2[2:6] pull up */
+				s5p_gpio_set_pull(&gpio2->k2, i, GPIO_PULL_UP);
+			}
+			
+			/* GPK2[0:6] drv 4x */
+			s5p_gpio_set_drv(&gpio2->k2, i, GPIO_DRV_4X);
 		}
 
-		/* GPK2[2:6] pull up */
-		s5p_gpio_set_pull(&gpio2->k2, i, GPIO_PULL_UP);
+		err = s5p_mmc_init(2, 4);
 	}
 
-	err = s5p_mmc_init(2, 4);
 	return err;
 }
 #endif
