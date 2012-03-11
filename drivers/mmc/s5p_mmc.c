@@ -354,7 +354,7 @@ static void mmc_set_ios(struct mmc *mmc)
 	 *	00 = Delay3 (inverter delay)
 	 *	10 = Delay4 (inverter delay + 2ns)
 	 */
-	writel(0x8080, &host->reg->control3);
+	writel(0x8888, &host->reg->control3);
 
 	mmc_change_clock(host, mmc->clock);
 
@@ -473,7 +473,7 @@ static int s5p_mmc_initialize(int dev_index, int bus_width)
 	mmc->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS | MMC_MODE_HC;
 
 	mmc->f_min = 400000;
-	mmc->f_max = 52000000;
+	mmc->f_max = 12000000;
 
 	mmc_host[dev_index].dev_index = dev_index;
 	mmc_host[dev_index].clock = 0;
