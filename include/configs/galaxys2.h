@@ -142,9 +142,9 @@
 	\
 	"emmc_boot=setenv devnum 0; " \
 		"echo Booting from EMMC; "\
-		"setenv script_part 8; " \
-		"setenv kernel_part 8; " \
-		"setenv rootpart 3; " \
+		"setenv script_part 0xb; " \
+		"setenv kernel_part 0xb; " \
+		"setenv rootpart 0xb; " \
 		"run mmc_boot\0" \
 	\
 	"microsd_boot=setenv devnum 1; " \
@@ -154,10 +154,20 @@
 		"setenv rootpart 2; " \
 		"run mmc_boot\0" \
 	\
+	"raw_boot=" \
+		"mmc dev 0 6; "\
+		"mmc read ${loadaddr} 0x0 0x4000; "\
+		"md ${loadaddr} 0x20; " \
+		"setenv bootargs ${dev_extras} root=/dev/mmcblk1p2; " \
+		"bootm ${loadaddr}; \0" \
+	\
 	"galaxy_boot=" \
-		"setenv loadaddr 0x43008000; "\
+		"setenv loadaddr 0x43E08000; " \
 		"setenv dev_extras console=tty0 --no-log lpj=3981312; "\
+		"mmc dev 1; " \
+		"mmc part; " \
 		"run microsd_boot; " \
+		"run raw_boot; " \
 		"run emmc_boot;\0"
 
 
