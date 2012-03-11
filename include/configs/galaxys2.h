@@ -155,6 +155,10 @@
 		"run mmc_boot\0" \
 	\
 	"galaxy_boot=" \
+		"mmc read 0 0 0x80 0x43008000; " \
+		"bootm 0x43008000; \0" \
+	\
+	"galaxy_boot2=" \
 		"setenv loadaddr 0x43008000; "\
 		"setenv dev_extras console=tty0 --no-log lpj=3981312; "\
 		"run microsd_boot; " \

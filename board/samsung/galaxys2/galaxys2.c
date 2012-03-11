@@ -68,6 +68,14 @@ static void blink_led(unsigned times) {
 	}
 }
 
+static void max8997_reg_update(struct pmic *p, u32 reg, int val, int mask) {
+	u32 tmp;
+	pmic_reg_read(p, reg, &tmp);
+	tmp &= ~mask;
+	tmp |= (val & mask);
+	pmic_reg_write(p, reg, tmp);
+}
+
 static void microsd_power_enable(void) {
 	u32 ctrl;
 	struct pmic *p = get_pmic();
@@ -75,17 +83,38 @@ static void microsd_power_enable(void) {
 		printf("failed to get pmic\n");
 		return;
 	}
-
-	unsigned vmask = ((1 << 7) - 1);
 	
-	//set to 3.3V
-	pmic_reg_read(p, MAX8997_REG_LDO17CTRL, &ctrl);
-	ctrl &= ~vmask;
-	ctrl |= 50;
-	ctrl |= MAX8997_MASK_LDO;
-	pmic_reg_write(p, MAX8997_REG_LDO17CTRL, ctrl);
+	//set 2.8V
+	max8997_reg_update(p, MAX8997_REG_LDO17CTRL, 40, 0x3f);
+
+	pmic_set_output(p, MAX8997_REG_LDO17CTRL,
+		MAX8997_MASK_LDO, LDO_ON);
 	
 	mdelay(50);
+}
+
+static void max8997_init (void) {
+	struct pmic *p;
+	int i;
+
+	if (pmic_init()) {
+		printf("failed to init pmic\n");
+		return;
+	}
+	
+	p = get_pmic();
+	if (pmic_probe(p)) {
+		printf("failed to get pmic\n");
+		return;
+	}
+	
+	/* For the safety, set max voltage before setting up */
+	for (i = 0; i < 8; i++) {
+		//these regulators are 650..2225mv by 25mv steps
+		max8997_reg_update(p, MAX8997_REG_BUCK1DVS1 + i, 28, 0x3f);
+		max8997_reg_update(p, MAX8997_REG_BUCK2DVS1 + i, 18, 0x3f);
+		max8997_reg_update(p, MAX8997_REG_BUCK5DVS1 + i, 22, 0x3f);
+	}
 }
 
 int board_init(void)
@@ -94,8 +123,8 @@ int board_init(void)
 	gpio2 = (struct exynos4_gpio_part2 *) EXYNOS4_GPIO_PART2_BASE;
 
 	gd->bd->bi_boot_params = (PHYS_SDRAM_1 + 0x100UL);
-	
-	pmic_init();
+
+	max8997_init();
 
 #ifndef CONFIG_VIDEO
 	blink_led(1);
