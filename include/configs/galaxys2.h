@@ -137,6 +137,7 @@
 	"mmc_boot=mmc rescan; " \
 		"setenv devtype mmc; " \
 		"setenv devname mmcblk${devnum}p; " \
+		"mmc dev ${devnum}; " \
 		"run run_disk_boot_script; " \
 		"run real_boot\0" \
 	\
@@ -164,6 +165,7 @@
 	"galaxy_boot=" \
 		"setenv loadaddr 0x43E08000; " \
 		"setenv dev_extras console=tty0 --no-log lpj=3981312; "\
+		"mmc rescan; " \
 		"run microsd_boot; " \
 		"run emmc_boot; " \
 		"run emmc_custom;\0"
