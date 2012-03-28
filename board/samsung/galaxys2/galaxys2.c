@@ -112,9 +112,10 @@ static void max8997_init (void) {
 	for (i = 0; i < 8; i++) {
 		//these regulators are 650..2225mv by 25mv steps
 		max8997_reg_update(p, MAX8997_REG_BUCK1DVS1 + i, 28, 0x3f);
-		max8997_reg_update(p, MAX8997_REG_BUCK2DVS1 + i, 18, 0x3f);
+		max8997_reg_update(p, MAX8997_REG_BUCK2DVS1 + i, 20, 0x3f);
 		max8997_reg_update(p, MAX8997_REG_BUCK5DVS1 + i, 22, 0x3f);
 	}
+	pmic_reg_write(p, MAX8997_REG_BUCKRAMP, 0xf9);
 }
 
 int board_init(void)
