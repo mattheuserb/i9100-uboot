@@ -28,6 +28,8 @@
 #ifndef __CONFIG_OMAP4_COMMON_H
 #define __CONFIG_OMAP4_COMMON_H
 
+#define NEXUS_HACK 1
+
 /*
  * High Level Configuration Options
  */
@@ -35,6 +37,11 @@
 #define CONFIG_OMAP		1	/* in a TI OMAP core */
 #define CONFIG_OMAP44XX		1	/* which is a 44XX */
 #define CONFIG_OMAP4430		1	/* which is in a 4430 */
+
+//#define CONFIG_SKIP_LOWLEVEL_INIT 1
+//#define CONFIG_SYS_DCACHE_OFF 1
+//#define CONFIG_SYS_ICACHE_OFF 1
+//#define CONFIG_SYS_L2CACHE_OFF 1
 
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
@@ -48,7 +55,7 @@
 #define V_OSCK			38400000	/* Clock output from T2 */
 #define V_SCLK                   V_OSCK
 
-#undef CONFIG_USE_IRQ				/* no support for IRQs */
+//#undef CONFIG_USE_IRQ				/* no support for IRQs */
 #define CONFIG_MISC_INIT_R
 
 #define CONFIG_OF_LIBFDT		1
@@ -121,7 +128,7 @@
 #define CONFIG_SYS_NO_FLASH	1
 
 /* clocks */
-#define CONFIG_SYS_CLOCKS_ENABLE_ALL
+//#define CONFIG_SYS_CLOCKS_ENABLE_ALL
 
 /* commands to include */
 #include <config_cmd_default.h>
@@ -228,7 +235,9 @@
 #define CONFIG_NR_DRAM_BANKS	1
 
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
+
 #define CONFIG_SYS_INIT_RAM_ADDR	0x4030D800
+//#define CONFIG_SYS_INIT_RAM_ADDR 0x80000800
 #define CONFIG_SYS_INIT_RAM_SIZE	0x800
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_INIT_RAM_ADDR + \
 					 CONFIG_SYS_INIT_RAM_SIZE - \
@@ -249,40 +258,49 @@
 #endif
 
 /* Defines for SPL */
-#define CONFIG_SPL
-#define CONFIG_SPL_TEXT_BASE		0x40304350
-#define CONFIG_SPL_MAX_SIZE		(38 * 1024)
-#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
+#if !NEXUS_HACK
+	#define CONFIG_SPL
+	#define CONFIG_SPL_TEXT_BASE		0x40304350
+	#define CONFIG_SPL_MAX_SIZE		(38 * 1024)
+	#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
+#endif
 
 /*
  * 64 bytes before this address should be set aside for u-boot.img's
  * header. That is 80E7FFC0--0x80E80000 should not be used for any
  * other needs.
  */
-#define CONFIG_SYS_TEXT_BASE		0x80E80000
 
-/*
- * BSS and malloc area 64MB into memory to allow enough
- * space for the kernel at the beginning of memory
- */
-#define CONFIG_SPL_BSS_START_ADDR	0x84000000
-#define CONFIG_SPL_BSS_MAX_SIZE		0x100000	/* 1 MB */
-#define CONFIG_SYS_SPL_MALLOC_START	0x84100000
-#define CONFIG_SYS_SPL_MALLOC_SIZE	0x100000	/* 1 MB */
+#if !NEXUS_HACK
+	#define CONFIG_SYS_TEXT_BASE		0x80E80000
+#else
+	#define CONFIG_SYS_TEXT_BASE		0x80008000
+#endif
 
-#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300 /* address 0x60000 */
-#define CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS	0x200 /* 256 KB */
-#define CONFIG_SYS_MMC_SD_FAT_BOOT_PARTITION	1
-#define CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME	"u-boot.img"
+#ifdef CONFIG_SPL
+	/*
+	 * BSS and malloc area 64MB into memory to allow enough
+	 * space for the kernel at the beginning of memory
+	 */
+	#define CONFIG_SPL_BSS_START_ADDR	0x84000000
+	#define CONFIG_SPL_BSS_MAX_SIZE		0x100000	/* 1 MB */
+	#define CONFIG_SYS_SPL_MALLOC_START	0x84100000
+	#define CONFIG_SYS_SPL_MALLOC_SIZE	0x100000	/* 1 MB */
 
-#define CONFIG_SPL_LIBCOMMON_SUPPORT
-#define CONFIG_SPL_LIBDISK_SUPPORT
-#define CONFIG_SPL_I2C_SUPPORT
-#define CONFIG_SPL_MMC_SUPPORT
-#define CONFIG_SPL_FAT_SUPPORT
-#define CONFIG_SPL_LIBGENERIC_SUPPORT
-#define CONFIG_SPL_SERIAL_SUPPORT
-#define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/omap-common/u-boot-spl.lds"
+	#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300 /* address 0x60000 */
+	#define CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS	0x200 /* 256 KB */
+	#define CONFIG_SYS_MMC_SD_FAT_BOOT_PARTITION	1
+	#define CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME	"u-boot.img"
+
+	#define CONFIG_SPL_LIBCOMMON_SUPPORT
+	#define CONFIG_SPL_LIBDISK_SUPPORT
+	#define CONFIG_SPL_I2C_SUPPORT
+	#define CONFIG_SPL_MMC_SUPPORT
+	#define CONFIG_SPL_FAT_SUPPORT
+	#define CONFIG_SPL_LIBGENERIC_SUPPORT
+	#define CONFIG_SPL_SERIAL_SUPPORT
+	#define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/omap-common/u-boot-spl.lds"
+#endif
 
 #define CONFIG_SYS_ENABLE_PADS_ALL
 

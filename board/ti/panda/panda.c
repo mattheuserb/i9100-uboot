@@ -66,6 +66,12 @@ int board_eth_init(bd_t *bis)
 	return 0;
 }
 
+void panda_led_toggle(void) {
+	int data = ((int*)0x4a310134)[0];
+	data &= ~(1 << 8);
+	((int*)0x4a310134)[0] = data;
+}
+
 /**
  * @brief misc_init_r - Configure Panda board specific configurations
  * such as power configurations, ethernet initialization as phase2 of

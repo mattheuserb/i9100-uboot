@@ -48,7 +48,7 @@
 #define CONFIG_USB_HOST_ETHER
 #define CONFIG_USB_ETHER_SMSC95XX
 
-#define CONFIG_UBOOT_ENABLE_PADS_ALL
+//#define CONFIG_UBOOT_ENABLE_PADS_ALL
 
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_DHCP
@@ -65,6 +65,6 @@
 /* ENV related config options */
 #define CONFIG_ENV_IS_NOWHERE
 
-#define CONFIG_SYS_PROMPT		"Panda # "
+#define CONFIG_SYS_PROMPT		"Nexus Panda # "
 
 #endif /* __CONFIG_PANDA_H */
