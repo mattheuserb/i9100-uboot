@@ -55,7 +55,7 @@
 #define V_OSCK			38400000	/* Clock output from T2 */
 #define V_SCLK                   V_OSCK
 
-#undef CONFIG_USE_IRQ				/* no support for IRQs */
+//#undef CONFIG_USE_IRQ				/* no support for IRQs */
 #define CONFIG_MISC_INIT_R
 
 #define CONFIG_OF_LIBFDT		1
@@ -122,7 +122,7 @@
 /* USB device configuration */
 #define CONFIG_USB_DEVICE		1
 #define CONFIG_USB_TTY			1
-#define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
+//#define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
 
 /* Flash */
 #define CONFIG_SYS_NO_FLASH	1
@@ -154,6 +154,7 @@
 #define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"echo Booting up; " \
 	"loadaddr=0x82000000\0" \
 	"console=ttyO2,115200n8\0" \
 	"fdt_high=0xffffffff\0" \
@@ -175,6 +176,7 @@
 		"bootm ${loadaddr}\0" \
 
 #define CONFIG_BOOTCOMMAND \
+	"echo Bootin up ;" \
 	"if mmc rescan ${mmcdev}; then " \
 		"if run loadbootscript; then " \
 			"run bootscript; " \
@@ -236,7 +238,7 @@
 
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 
-#define CONFIG_SYS_INIT_RAM_ADDR	0x4030D800
+#define CONFIG_SYS_INIT_RAM_ADDR	0x8030D800
 #define CONFIG_SYS_INIT_RAM_SIZE	0x800
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_INIT_RAM_ADDR + \
 					 CONFIG_SYS_INIT_RAM_SIZE - \
@@ -268,9 +270,9 @@
 #define CONFIG_CFB_CONSOLE
 #define CONFIG_VGA_AS_SINGLE_DEVICE
 
-#define CONFIG_STD_DEVICES_SETTINGS "stdin=serial\0" \
-									"stdout=serial,lcd\0" \
-									"stderr=serial,lcd\0"
+#define CONFIG_STD_DEVICES_SETTINGS "stdin=lcd\0" \
+									"stdout=lcd,vga\0" \
+									"stderr=lcd,vga\0"
 
 /*
  * 64 bytes before this address should be set aside for u-boot.img's

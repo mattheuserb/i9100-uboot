@@ -222,6 +222,7 @@ void __dram_init_banksize(void)
 	gd->bd->bi_dram[0].size =  gd->ram_size;
 }
 
+extern void gnex_fb(void);
 extern void gnex_progress(int x);
 int __gnex_dbg(void) {
 
@@ -337,6 +338,8 @@ void board_init_f(ulong bootflag)
 	 * Ram is setup, size stored in gd !!
 	 */
 	debug("ramsize: %08lX\n", gd->ram_size);
+	//XXX
+	gd->ram_size = 0x100000;
 #if defined(CONFIG_SYS_MEM_TOP_HIDE)
 	/*
 	 * Subtract specified amount of memory to hide so that it won't
@@ -455,20 +458,24 @@ void board_init_f(ulong bootflag)
 	post_run(NULL, POST_ROM | post_bootmode_get(0));
 #endif
 
-	//gd->bd->bi_baudrate = gd->baudrate;
+	gd->bd->bi_baudrate = gd->baudrate;
 	/* Ram ist board specific, so move it to board code ... */
+
 	dram_init_banksize();
+
+	//gnex_progress(20);
+
 	display_dram_config();	/* and display it */
 	
-	gnex_progress(40);
+	//gnex_progress(100);
 
 	gd->relocaddr = addr;
 	gd->start_addr_sp = addr_sp;
 	gd->reloc_off = addr - _TEXT_BASE;
-	gnex_progress(60);
+	//gnex_progress(60);
 	debug("relocation Offset is: %08lx\n", gd->reloc_off);
 	memcpy(id, (void *)gd, sizeof(gd_t));
-	gnex_progress(100);
+	//gnex_progress(0);
 
 	relocate_code(addr_sp, id, addr);
 
@@ -644,6 +651,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #endif
 #endif
 
+
 #ifdef CONFIG_POST
 	post_run(NULL, POST_RAM | post_bootmode_get(0));
 #endif
@@ -670,7 +678,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 		setenv("mem", (char *)memsz);
 	}
 #endif
-
+	
 	/* main_loop() can return to retry autoboot, if so just run it again. */
 	for (;;) {
 		main_loop();

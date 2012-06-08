@@ -34,6 +34,7 @@
 #define CONFIG_PANDA	/* working with Panda */
 
 /* USB UHH support options */
+#if 0
 #define CONFIG_CMD_USB
 #define CONFIG_USB_HOST
 #define CONFIG_USB_EHCI
@@ -48,13 +49,17 @@
 #define CONFIG_USB_HOST_ETHER
 #define CONFIG_USB_ETHER_SMSC95XX
 
+#endif
+
 //#define CONFIG_UBOOT_ENABLE_PADS_ALL
 
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_DHCP
 
+#if 0
 #define CONFIG_USB_ULPI
 #define CONFIG_USB_ULPI_VIEWPORT_OMAP
+#endif
 
 #include <configs/omap4_common.h>
 #define CONFIG_CMD_NET

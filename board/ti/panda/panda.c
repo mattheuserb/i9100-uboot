@@ -69,17 +69,17 @@ void gnex_fb(void) {
 	for (i = 0; i < (1 << 20); i++) {
 		asm("nop");
 	}
-	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 4);
-	memset((void*)TUNA_FB, 0x0, TUNA_XRES * TUNA_YRES * 2);
+	memset((void*)TUNA_FB, 0x80, TUNA_XRES * TUNA_YRES * 4);
+	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 2);
 }
 
 void gnex_progress(int x) {
-	memset((void*)TUNA_FB, 0x0, TUNA_XRES * TUNA_YRES * 4);
+	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 4);
 	volatile int i;
 	for (i = 0; i < (1 << 20); i++) {
 		asm("nop");
 	}
-	memset((void*)TUNA_FB, 0xff, (TUNA_XRES * TUNA_YRES * 4 * x) / 100);
+	memset((void*)TUNA_FB, 0x0, (TUNA_XRES * TUNA_YRES * 4 * x) / 100);
 }
 
 void gnex_dump(int data) {
@@ -110,11 +110,12 @@ void gnex_dump(int data) {
 GraphicDevice gdev;
 
 void *video_hw_init(void) {
+	memset((void*)TUNA_FB, 0x00, TUNA_XRES * TUNA_YRES * 4);
 	gdev.frameAdrs = TUNA_FB;
 	gdev.winSizeX = TUNA_XRES;
 	gdev.winSizeY = TUNA_YRES;
 	gdev.gdfBytesPP = 4;
-	gdev.gdfIndex = GDF_32BIT_X888RGB;
+	gdev.gdfIndex = GDF_24BIT_888RGB;
 	return &gdev;
 }
 #endif
@@ -133,13 +134,10 @@ void *video_hw_init(void) {
 
 int board_init(void)
 {
-	//gnex_fb();
 	gpmc_init();
 
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP4_PANDA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
-
-	//gnex_boot_indicate();
 
 	return 0;
 }
@@ -164,6 +162,7 @@ void panda_led_toggle(void) {
  */
 int misc_init_r(void)
 {
+#if 0
 	int phy_type;
 	u32 auxclk, altclksrc;
 
@@ -216,11 +215,13 @@ int misc_init_r(void)
 	altclksrc |= ALTCLKSRC_ENABLE_INT_MASK | ALTCLKSRC_ENABLE_EXT_MASK;
 
 	writel(altclksrc, &scrm->altclksrc);
+#endif
 	return 0;
 }
 
 void set_muxconf_regs_essential(void)
 {
+#if 0
 	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_essential,
 		   sizeof(core_padconf_array_essential) /
 		   sizeof(struct pad_conf_entry));
@@ -234,10 +235,12 @@ void set_muxconf_regs_essential(void)
 				 wkup_padconf_array_essential_4460,
 				 sizeof(wkup_padconf_array_essential_4460) /
 				 sizeof(struct pad_conf_entry));
+#endif
 }
 
 void set_muxconf_regs_non_essential(void)
 {
+#if 0
 	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential,
 		   sizeof(core_padconf_array_non_essential) /
 		   sizeof(struct pad_conf_entry));
@@ -262,6 +265,7 @@ void set_muxconf_regs_non_essential(void)
 				wkup_padconf_array_non_essential_4430,
 				sizeof(wkup_padconf_array_non_essential_4430) /
 				sizeof(struct pad_conf_entry));
+#endif
 }
 
 #if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_GENERIC_MMC)
