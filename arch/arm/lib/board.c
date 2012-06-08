@@ -221,6 +221,14 @@ void __dram_init_banksize(void)
 	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
 	gd->bd->bi_dram[0].size =  gd->ram_size;
 }
+
+extern void gnex_progress(int x);
+int __gnex_dbg(void) {
+
+	gnex_progress(10);
+	return 0;
+}
+
 void dram_init_banksize(void)
 	__attribute__((weak, alias("__dram_init_banksize")));
 
@@ -253,8 +261,12 @@ init_fnc_t *init_sequence[] = {
 	init_func_i2c,
 #endif
 	dram_init,		/* configure available RAM banks */
+	__gnex_dbg,
 	NULL,
 };
+
+extern void gnex_dump(int data);
+extern void _start(void);
 
 void board_init_f(ulong bootflag)
 {
@@ -265,6 +277,8 @@ void board_init_f(ulong bootflag)
 #ifdef CONFIG_PRAM
 	ulong reg;
 #endif
+	//OK
+	gnex_progress(10);
 
 	bootstage_mark_name(BOOTSTAGE_ID_START_UBOOT_F, "board_init_f");
 
@@ -274,6 +288,9 @@ void board_init_f(ulong bootflag)
 	__asm__ __volatile__("": : :"memory");
 
 	memset((void *)gd, 0, sizeof(gd_t));
+
+	//OK
+	gnex_progress(20);
 
 	gd->mon_len = _bss_end_ofs;
 #ifdef CONFIG_OF_EMBED
@@ -286,12 +303,23 @@ void board_init_f(ulong bootflag)
 	/* Allow the early environment to override the fdt address */
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
 						(uintptr_t)gd->fdt_blob);
+	
+	gnex_progress(30);
+	gnex_dump(init_sequence[0]);
+
+	int ___i = 60;
+	/* breaks here */
 
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
+		gnex_dump(init_fnc_ptr);
 		if ((*init_fnc_ptr)() != 0) {
 			hang ();
 		}
+		gnex_progress(___i++);
 	}
+	gnex_progress(100);
+
+	/* does not work from now on */
 
 #ifdef CONFIG_OF_CONTROL
 	/* For now, put this check after the console is ready */

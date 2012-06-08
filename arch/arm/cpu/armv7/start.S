@@ -124,16 +124,6 @@ IRQ_STACK_START_IN:
  */
 
 reset:
-	mov r0, #0x40000000
-	orr r0, #0x0a000000
-	orr r0, #0x00300000
-	orr r0, #0x00010000
-	orr r0, #0x134
-	ldr r1, [r0]
-	mov r1, #0xfe00
-	orr r1, #0xff
-	str r1, [r0]
-
 	bl	save_boot_params
 	/*
 	 * set the cpu to SVC32 mode

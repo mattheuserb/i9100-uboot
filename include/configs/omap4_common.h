@@ -38,10 +38,10 @@
 #define CONFIG_OMAP44XX		1	/* which is a 44XX */
 #define CONFIG_OMAP4430		1	/* which is in a 4430 */
 
-//#define CONFIG_SKIP_LOWLEVEL_INIT 1
-//#define CONFIG_SYS_DCACHE_OFF 1
-//#define CONFIG_SYS_ICACHE_OFF 1
-//#define CONFIG_SYS_L2CACHE_OFF 1
+#define CONFIG_SKIP_LOWLEVEL_INIT 1
+#define CONFIG_SYS_DCACHE_OFF 1
+#define CONFIG_SYS_ICACHE_OFF 1
+#define CONFIG_SYS_L2CACHE_OFF 1
 
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
@@ -55,7 +55,7 @@
 #define V_OSCK			38400000	/* Clock output from T2 */
 #define V_SCLK                   V_OSCK
 
-//#undef CONFIG_USE_IRQ				/* no support for IRQs */
+#undef CONFIG_USE_IRQ				/* no support for IRQs */
 #define CONFIG_MISC_INIT_R
 
 #define CONFIG_OF_LIBFDT		1
@@ -209,7 +209,7 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + (32 << 20))
 
 /* Default load address */
-#define CONFIG_SYS_LOAD_ADDR		0x80000000
+#define CONFIG_SYS_LOAD_ADDR		0x81000000
 
 /* Use General purpose timer 1 */
 #define CONFIG_SYS_TIMERBASE		GPT2_BASE
@@ -237,7 +237,6 @@
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 
 #define CONFIG_SYS_INIT_RAM_ADDR	0x4030D800
-//#define CONFIG_SYS_INIT_RAM_ADDR 0x80000800
 #define CONFIG_SYS_INIT_RAM_SIZE	0x800
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_INIT_RAM_ADDR + \
 					 CONFIG_SYS_INIT_RAM_SIZE - \
@@ -264,6 +263,14 @@
 	#define CONFIG_SPL_MAX_SIZE		(38 * 1024)
 	#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
 #endif
+
+#define CONFIG_VIDEO
+#define CONFIG_CFB_CONSOLE
+#define CONFIG_VGA_AS_SINGLE_DEVICE
+
+#define CONFIG_STD_DEVICES_SETTINGS "stdin=serial\0" \
+									"stdout=serial,lcd\0" \
+									"stderr=serial,lcd\0"
 
 /*
  * 64 bytes before this address should be set aside for u-boot.img's
@@ -302,8 +309,9 @@
 	#define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/omap-common/u-boot-spl.lds"
 #endif
 
-#define CONFIG_SYS_ENABLE_PADS_ALL
-
-#define CONFIG_SYS_THUMB_BUILD
+#if 0
+	#define CONFIG_SYS_ENABLE_PADS_ALL
+	#define CONFIG_SYS_THUMB_BUILD
+#endif
 
 #endif /* __CONFIG_OMAP4_COMMON_H */
