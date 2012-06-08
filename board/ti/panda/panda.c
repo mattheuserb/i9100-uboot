@@ -46,17 +46,100 @@ const struct omap_sysinfo sysinfo = {
 
 struct omap4_scrm_regs *const scrm = (struct omap4_scrm_regs *)0x4a30a000;
 
+void gnex_boot_indicate(void) {
+	u8 chip = 0x30;
+
+	i2c_set_bus_num(3);
+
+	u8 reg = 1;
+	u8 val = 0xff;
+	i2c_write(chip, reg, 1, &val, 1);
+
+	reg = 3;
+	i2c_write(chip, reg, 1, &val, 1);
+}
+
+#define TUNA_FB 0xbea70000
+#define TUNA_XRES 720
+#define TUNA_YRES 1280
+
+void gnex_fb(void) {
+	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 2);
+	volatile int i;
+	for (i = 0; i < (1 << 20); i++) {
+		asm("nop");
+	}
+	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 4);
+	memset((void*)TUNA_FB, 0x0, TUNA_XRES * TUNA_YRES * 2);
+}
+
+void gnex_progress(int x) {
+	memset((void*)TUNA_FB, 0x0, TUNA_XRES * TUNA_YRES * 4);
+	volatile int i;
+	for (i = 0; i < (1 << 20); i++) {
+		asm("nop");
+	}
+	memset((void*)TUNA_FB, 0xff, (TUNA_XRES * TUNA_YRES * 4 * x) / 100);
+}
+
+void gnex_dump(int data) {
+	memset((void*)TUNA_FB, 0x0, TUNA_XRES * TUNA_YRES * 4);
+	volatile int i, j;
+	volatile int x;
+	volatile int *base;
+	for (i = 0; i < (1 << 20); i++) {
+		asm("nop");
+	}
+	
+	for (i = 0; i < 32; i++) {
+		base = TUNA_FB + (i * 720 * 4) * 20 * 2;
+		memset(base, (data & (1 << i)) ? 0xff : 0x80, 20 * 4 * TUNA_XRES);
+		for (j = 0; j < (1 << 20); j++) {
+			asm("nop");
+		}
+	}
+
+	for (i = 0; i < (1 << 20); i++) {
+		asm("nop");
+	}
+}
+
+#ifdef CONFIG_VIDEO
+#include <video_fb.h>
+
+GraphicDevice gdev;
+
+void *video_hw_init(void) {
+	gdev.frameAdrs = TUNA_FB;
+	gdev.winSizeX = TUNA_XRES;
+	gdev.winSizeY = TUNA_YRES;
+	gdev.gdfBytesPP = 4;
+	gdev.gdfIndex = GDF_32BIT_X888RGB;
+	return &gdev;
+}
+#endif
+
 /**
  * @brief board_init
  *
  * @return 0
  */
+
+#define GPIO_MOTOR_EN_REV05	54
+/*
+ * bank gpio2 bit 5
+ *
+ */
+
 int board_init(void)
 {
+	//gnex_fb();
 	gpmc_init();
 
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP4_PANDA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
+
+	//gnex_boot_indicate();
 
 	return 0;
 }
@@ -133,7 +216,6 @@ int misc_init_r(void)
 	altclksrc |= ALTCLKSRC_ENABLE_INT_MASK | ALTCLKSRC_ENABLE_EXT_MASK;
 
 	writel(altclksrc, &scrm->altclksrc);
-
 	return 0;
 }
 
