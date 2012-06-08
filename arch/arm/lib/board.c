@@ -225,7 +225,7 @@ void __dram_init_banksize(void)
 extern void gnex_progress(int x);
 int __gnex_dbg(void) {
 
-	gnex_progress(10);
+	//gnex_progress(10);
 	return 0;
 }
 
@@ -261,7 +261,6 @@ init_fnc_t *init_sequence[] = {
 	init_func_i2c,
 #endif
 	dram_init,		/* configure available RAM banks */
-	__gnex_dbg,
 	NULL,
 };
 
@@ -278,7 +277,7 @@ void board_init_f(ulong bootflag)
 	ulong reg;
 #endif
 	//OK
-	gnex_progress(10);
+	//gnex_progress(10);
 
 	bootstage_mark_name(BOOTSTAGE_ID_START_UBOOT_F, "board_init_f");
 
@@ -290,7 +289,7 @@ void board_init_f(ulong bootflag)
 	memset((void *)gd, 0, sizeof(gd_t));
 
 	//OK
-	gnex_progress(20);
+	//gnex_progress(20);
 
 	gd->mon_len = _bss_end_ofs;
 #ifdef CONFIG_OF_EMBED
@@ -304,20 +303,24 @@ void board_init_f(ulong bootflag)
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
 						(uintptr_t)gd->fdt_blob);
 	
-	gnex_progress(30);
-	gnex_dump(init_sequence[0]);
+	//gnex_progress(30);
+
+	//int _pc = 0;
+	//__asm__ __volatile__("mov %[ret], pc" : [ret]"=r"(_pc));
+	//gnex_dump(_pc);
+	//while (1) {}
+	
+	//gnex_dump(init_sequence[0]);
 
 	int ___i = 60;
 	/* breaks here */
 
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
-		gnex_dump(init_fnc_ptr);
 		if ((*init_fnc_ptr)() != 0) {
+			gnex_dump(init_fnc_ptr);
 			hang ();
 		}
-		gnex_progress(___i++);
 	}
-	gnex_progress(100);
 
 	/* does not work from now on */
 
@@ -452,16 +455,20 @@ void board_init_f(ulong bootflag)
 	post_run(NULL, POST_ROM | post_bootmode_get(0));
 #endif
 
-	gd->bd->bi_baudrate = gd->baudrate;
+	//gd->bd->bi_baudrate = gd->baudrate;
 	/* Ram ist board specific, so move it to board code ... */
 	dram_init_banksize();
 	display_dram_config();	/* and display it */
+	
+	gnex_progress(40);
 
 	gd->relocaddr = addr;
 	gd->start_addr_sp = addr_sp;
 	gd->reloc_off = addr - _TEXT_BASE;
+	gnex_progress(60);
 	debug("relocation Offset is: %08lx\n", gd->reloc_off);
 	memcpy(id, (void *)gd, sizeof(gd_t));
+	gnex_progress(100);
 
 	relocate_code(addr_sp, id, addr);
 
