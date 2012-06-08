@@ -428,10 +428,13 @@ int i2c_set_bus_num(unsigned int bus)
 		return -1;
 	}
 
-#if I2C_BUS_MAX == 3
+#if I2C_BUS_MAX >= 4
+	if (bus == 3)
+		i2c_base = (struct i2c *)I2C_BASE4;
+#endif
+#if I2C_BUS_MAX >= 3
 	if (bus == 2)
 		i2c_base = (struct i2c *)I2C_BASE3;
-	else
 #endif
 	if (bus == 1)
 		i2c_base = (struct i2c *)I2C_BASE2;
