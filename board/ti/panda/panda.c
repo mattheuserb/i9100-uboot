@@ -22,6 +22,8 @@
  * MA 02111-1307 USA
  */
 #include <common.h>
+#include <mmc.h>
+#include <i2c.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/clocks.h>
@@ -46,36 +48,17 @@ const struct omap_sysinfo sysinfo = {
 
 struct omap4_scrm_regs *const scrm = (struct omap4_scrm_regs *)0x4a30a000;
 
-#define AN30259A_REG_SRESET		0x00
-#define AN30259A_SRESET			0x01
-#define AN30259A_REG_SEL		0x02
+static void tuna_clear_i2c4(void) {
+	unsigned r;
 
-#define AN30259A_REG_LEDON		0x01
-#define AN30259A_REG_LED1CC		0x03
-
-void gnex_boot_indicate(void) {
-	u8 reg, val;
-	u8 chip = 0x30;
-
-	i2c_set_bus_num(3);
-	i2c_probe(chip);
-
-	reg = AN30259A_REG_SRESET;
-	val = AN30259A_SRESET;
-	i2c_write(chip, reg, 1, &val, 1);
-
-	reg = AN30259A_REG_LEDON;
-	val = 0xff;
-	i2c_write(chip, reg, 1, &val, 1);
-	
-	reg = AN30259A_REG_SEL;
-	val = 0xff;
-	i2c_write(chip, reg, 1, &val, 1);
-
-	reg = AN30259A_REG_LED1CC;
-	val = 0xff;
-	i2c_write(chip, reg, 1, &val, 1);
+	r = readl(CONTROL_PADCONF_CORE + 0x604);
+	r |= (1 << 28);
+	writel(r, CONTROL_PADCONF_CORE + 0x604);
 }
+
+/******************************************************************************
+ * Revision detection
+ *****************************************************************************/
 
 #define TUNA_REV_MASK		0xf
 #define TUNA_REV_03			0x3
@@ -153,6 +136,13 @@ static void gnex_get_revision(void) {
 		73,
 		170,
 	};
+	unsigned r;
+	
+	//disable usb HSIC pullup
+	r = readl(CONTROL_PADCONF_CORE + 0x5c4);
+	r &= ~(3 << 14);
+	writel(r, CONTROL_PADCONF_CORE + 0x5c4);
+	
 	for (i = 0; i < ARRAY_SIZE(gpios); i++) {
 		gpio_direction_input(gpios[i]);
 		revision |= (gpio_get_value(gpios[i]) << i);
@@ -169,7 +159,7 @@ int do_tuna_print_revision(cmd_tbl_t *cmdtp, int flag,
 		return;
 	}
 	printf("Tuna revision %d: %s\n", tuna_hw_rev, rev_name);
-	gnex_boot_indicate();
+	return 0;
 }
 
 U_BOOT_CMD(tuna_print_revision, CONFIG_SYS_MAXARGS, 1, do_tuna_print_revision,
@@ -177,55 +167,17 @@ U_BOOT_CMD(tuna_print_revision, CONFIG_SYS_MAXARGS, 1, do_tuna_print_revision,
 	"tuna_print_revision\n"
 );
 
-#define TUNA_FB 0xbea70000
-#define TUNA_XRES 720
-#define TUNA_YRES 1280
-
-void gnex_fb(void) {
-	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 2);
-	volatile int i;
-	for (i = 0; i < (1 << 20); i++) {
-		asm("nop");
-	}
-	memset((void*)TUNA_FB, 0x80, TUNA_XRES * TUNA_YRES * 4);
-	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 2);
-}
-
-void gnex_progress(int x) {
-	memset((void*)TUNA_FB, 0xff, TUNA_XRES * TUNA_YRES * 4);
-	volatile int i;
-	for (i = 0; i < (1 << 20); i++) {
-		asm("nop");
-	}
-	memset((void*)TUNA_FB, 0x0, (TUNA_XRES * TUNA_YRES * 4 * x) / 100);
-}
-
-void gnex_dump(int data) {
-	memset((void*)TUNA_FB, 0x0, TUNA_XRES * TUNA_YRES * 4);
-	volatile int i, j;
-	volatile int x;
-	volatile int *base;
-	for (i = 0; i < (1 << 20); i++) {
-		asm("nop");
-	}
-	
-	for (i = 0; i < 32; i++) {
-		base = TUNA_FB + (i * 720 * 4) * 20 * 2;
-		memset(base, (data & (1 << i)) ? 0xff : 0x80, 20 * 4 * TUNA_XRES);
-		for (j = 0; j < (1 << 20); j++) {
-			asm("nop");
-		}
-	}
-
-	for (i = 0; i < (1 << 20); i++) {
-		asm("nop");
-	}
-}
-
+/******************************************************************************
+ * Framebuffer
+ *****************************************************************************/
 #ifdef CONFIG_VIDEO
 #include <video_fb.h>
 
 GraphicDevice gdev;
+
+#define TUNA_FB 0xbea70000
+#define TUNA_XRES 720
+#define TUNA_YRES 1280
 
 void *video_hw_init(void) {
 	memset((void*)TUNA_FB, 0x00, TUNA_XRES * TUNA_YRES * 4);
@@ -244,18 +196,13 @@ void *video_hw_init(void) {
  * @return 0
  */
 
-#define GPIO_MOTOR_EN_REV05	54
-/*
- * bank gpio2 bit 5
- *
- */
-
 int board_init(void)
 {
 	gpmc_init();
 
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP4_PANDA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
+	gd->ram_size = 0x80000000;
 
 	return 0;
 }
@@ -263,12 +210,6 @@ int board_init(void)
 int board_eth_init(bd_t *bis)
 {
 	return 0;
-}
-
-void panda_led_toggle(void) {
-	int data = ((int*)0x4a310134)[0];
-	data &= ~(1 << 8);
-	((int*)0x4a310134)[0] = data;
 }
 
 /**
@@ -383,7 +324,19 @@ void set_muxconf_regs_non_essential(void)
 #if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_GENERIC_MMC)
 int board_mmc_init(bd_t *bis)
 {
-	omap_mmc_init(0, 0, 0);
+	gpio_direction_output(6, 1);
+	gpio_set_value(6, 1);
+
+	gpio_direction_output(158, 0);
+	//gpio_set_value(158, 1);
+
+	tuna_clear_i2c4();
+
+	i2c_set_bus_num(0);
+	i2c_probe(0x48);
+
+	omap_mmc_init(0, 0, 400 * 1000);
+	omap_mmc_init(1, 0, 400 * 1000);
 	return 0;
 }
 #endif
@@ -425,5 +378,5 @@ int ehci_hcd_stop(void)
 u32 get_board_rev(void)
 {
 	gnex_get_revision();
-	return tuna_hw_rev;
+	return omap4_tuna_get_revision();
 }

@@ -113,7 +113,7 @@
 #define CONFIG_MMC			1
 #define CONFIG_OMAP_HSMMC		1
 #define CONFIG_DOS_PARTITION		1
-
+#define CONFIG_EFI_PARTITION		1
 
 /* USB */
 #define CONFIG_MUSB_UDC			1
@@ -162,7 +162,7 @@
 	"fdt_high=0xffffffff\0" \
 	"usbtty=cdc_acm\0" \
 	"vram=16M\0" \
-	"mmcdev=0\0" \
+	"mmcdev=1\0" \
 	"mmcroot=/dev/mmcblk0p2 rw\0" \
 	"mmcrootfstype=ext3 rootwait\0" \
 	"echo Booting up; " \
@@ -182,6 +182,10 @@
 	"setenv usbtty cdc_acm ;" \
 	"echo Booting up ;" \
 	"tuna_print_revision; "\
+	"mmc rescan; " \
+	"mmc list; " \
+	"mmc part 0; " \
+	"mmc part 1; " \
 	"if mmc rescan ${mmcdev}; then " \
 		"if run loadbootscript; then " \
 			"run bootscript; " \
