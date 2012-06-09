@@ -46,18 +46,136 @@ const struct omap_sysinfo sysinfo = {
 
 struct omap4_scrm_regs *const scrm = (struct omap4_scrm_regs *)0x4a30a000;
 
+#define AN30259A_REG_SRESET		0x00
+#define AN30259A_SRESET			0x01
+#define AN30259A_REG_SEL		0x02
+
+#define AN30259A_REG_LEDON		0x01
+#define AN30259A_REG_LED1CC		0x03
+
 void gnex_boot_indicate(void) {
+	u8 reg, val;
 	u8 chip = 0x30;
 
 	i2c_set_bus_num(3);
+	i2c_probe(chip);
 
-	u8 reg = 1;
-	u8 val = 0xff;
+	reg = AN30259A_REG_SRESET;
+	val = AN30259A_SRESET;
 	i2c_write(chip, reg, 1, &val, 1);
 
-	reg = 3;
+	reg = AN30259A_REG_LEDON;
+	val = 0xff;
+	i2c_write(chip, reg, 1, &val, 1);
+	
+	reg = AN30259A_REG_SEL;
+	val = 0xff;
+	i2c_write(chip, reg, 1, &val, 1);
+
+	reg = AN30259A_REG_LED1CC;
+	val = 0xff;
 	i2c_write(chip, reg, 1, &val, 1);
 }
+
+#define TUNA_REV_MASK		0xf
+#define TUNA_REV_03			0x3
+#define TUNA_REV_SAMPLE_4	0x3
+
+#define TUNA_TYPE_TORO		0x10
+#define TUNA_TYPE_MAGURO	0x00
+#define TUNA_TYPE_MASK		0x10
+
+static int tuna_hw_rev = -1;
+
+static const char const *omap4_tuna_hw_name_maguro[] = {
+	[0x00] = "Toro Lunchbox #1",
+	[0x01] = "Maguro 1st Sample",
+	[0x02] = "Maguro 2nd Sample",
+	[0x03] = "Maguro 4th Sample",
+	[0x05] = "Maguro 5th Sample",
+	[0x07] = "Maguro 6th Sample",
+	[0x08] = "Maguro 7th Sample",
+	[0x09] = "Maguro 8th Sample",
+};
+
+static const char const *omap4_tuna_hw_name_toro[] = {
+	[0x00] = "Toro Lunchbox #2",
+	[0x01] = "Toro 1st Sample",
+	[0x02] = "Toro 2nd Sample",
+	[0x03] = "Toro 4th Sample",
+	[0x05] = "Toro 5th Sample",
+	[0x06] = "Toro 8th Sample",
+	[0x08] = "Toro 8th Sample",
+	[0x09] = "Toro 8-1th Sample",
+	[0x0e] = "Toro Plus 1st Sample",
+};
+
+static int omap4_tuna_get_revision(void)
+{
+	return tuna_hw_rev & TUNA_REV_MASK;
+}
+
+static int omap4_tuna_get_type(void)
+{
+	return tuna_hw_rev & TUNA_TYPE_MASK;
+}
+
+static const char *omap4_tuna_hw_rev_name(void) {
+	const char *ret;
+	const char **names;
+	int num;
+	int rev;
+
+	if (omap4_tuna_get_type() == TUNA_TYPE_MAGURO) {
+		names = omap4_tuna_hw_name_maguro;
+		num = ARRAY_SIZE(omap4_tuna_hw_name_maguro);
+		ret = "Maguro unknown";
+	} else {
+		names = omap4_tuna_hw_name_toro;
+		num = ARRAY_SIZE(omap4_tuna_hw_name_toro);
+		ret = "Toro unknown";
+	}
+
+	rev = omap4_tuna_get_revision();
+	if (rev >= num || !names[rev])
+		return ret;
+
+	return names[rev];
+}
+
+static void gnex_get_revision(void) {
+	size_t i;
+	int revision = 0;
+	unsigned gpios[] = {
+		76,
+		75,
+		74,
+		73,
+		170,
+	};
+	for (i = 0; i < ARRAY_SIZE(gpios); i++) {
+		gpio_direction_input(gpios[i]);
+		revision |= (gpio_get_value(gpios[i]) << i);
+	}
+	tuna_hw_rev = revision;
+}
+
+int do_tuna_print_revision(cmd_tbl_t *cmdtp, int flag,
+	int argc, char * const argv[])
+{
+	gnex_get_revision();
+	const char *rev_name = omap4_tuna_hw_rev_name();
+	if (!rev_name) {
+		return;
+	}
+	printf("Tuna revision %d: %s\n", tuna_hw_rev, rev_name);
+	gnex_boot_indicate();
+}
+
+U_BOOT_CMD(tuna_print_revision, CONFIG_SYS_MAXARGS, 1, do_tuna_print_revision,
+	"Print Tuna (Galaxy Nexus) revision\n",
+	"tuna_print_revision\n"
+);
 
 #define TUNA_FB 0xbea70000
 #define TUNA_XRES 720
@@ -162,7 +280,6 @@ void panda_led_toggle(void) {
  */
 int misc_init_r(void)
 {
-#if 0
 	int phy_type;
 	u32 auxclk, altclksrc;
 
@@ -215,13 +332,11 @@ int misc_init_r(void)
 	altclksrc |= ALTCLKSRC_ENABLE_INT_MASK | ALTCLKSRC_ENABLE_EXT_MASK;
 
 	writel(altclksrc, &scrm->altclksrc);
-#endif
 	return 0;
 }
 
 void set_muxconf_regs_essential(void)
 {
-#if 0
 	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_essential,
 		   sizeof(core_padconf_array_essential) /
 		   sizeof(struct pad_conf_entry));
@@ -235,12 +350,10 @@ void set_muxconf_regs_essential(void)
 				 wkup_padconf_array_essential_4460,
 				 sizeof(wkup_padconf_array_essential_4460) /
 				 sizeof(struct pad_conf_entry));
-#endif
 }
 
 void set_muxconf_regs_non_essential(void)
 {
-#if 0
 	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential,
 		   sizeof(core_padconf_array_non_essential) /
 		   sizeof(struct pad_conf_entry));
@@ -265,7 +378,6 @@ void set_muxconf_regs_non_essential(void)
 				wkup_padconf_array_non_essential_4430,
 				sizeof(wkup_padconf_array_non_essential_4430) /
 				sizeof(struct pad_conf_entry));
-#endif
 }
 
 #if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_GENERIC_MMC)
@@ -312,5 +424,6 @@ int ehci_hcd_stop(void)
  */
 u32 get_board_rev(void)
 {
-	return 0x20;
+	gnex_get_revision();
+	return tuna_hw_rev;
 }

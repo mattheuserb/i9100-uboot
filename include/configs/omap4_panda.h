@@ -51,12 +51,15 @@
 
 #endif
 
-//#define CONFIG_UBOOT_ENABLE_PADS_ALL
+#define CONFIG_UBOOT_ENABLE_PADS_ALL
 
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_DHCP
 
-#if 0
+#if 1
+#define CONFIG_USBD_MANUFACTURER "Samsung"
+#define CONFIG_USBD_PRODUCT_NAME "Galaxy Nexus"
+
 #define CONFIG_USB_ULPI
 #define CONFIG_USB_ULPI_VIEWPORT_OMAP
 #endif
@@ -70,6 +73,6 @@
 /* ENV related config options */
 #define CONFIG_ENV_IS_NOWHERE
 
-#define CONFIG_SYS_PROMPT		"Nexus Panda # "
+#define CONFIG_SYS_PROMPT		"Galaxy Nexus # "
 
 #endif /* __CONFIG_PANDA_H */

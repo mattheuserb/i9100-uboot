@@ -41,6 +41,8 @@ const struct pad_conf_entry core_padconf_array_essential[] = {
 {GPMC_AD7, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat7 */
 {GPMC_NOE, (PTU | IEN | OFF_EN | OFF_OUT_PTD | M1)},	 /* sdmmc2_clk */
 {GPMC_NWE, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_cmd */
+
+//OK
 {SDMMC1_CLK, (PTU | OFF_EN | OFF_OUT_PTD | M0)},	 /* sdmmc1_clk */
 {SDMMC1_CMD, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_cmd */
 {SDMMC1_DAT0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat0 */
@@ -51,6 +53,7 @@ const struct pad_conf_entry core_padconf_array_essential[] = {
 {SDMMC1_DAT5, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat5 */
 {SDMMC1_DAT6, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat6 */
 {SDMMC1_DAT7, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat7 */
+
 {I2C1_SCL, (PTU | IEN | M0)},				/* i2c1_scl */
 {I2C1_SDA, (PTU | IEN | M0)},				/* i2c1_sda */
 {I2C2_SCL, (PTU | IEN | M0)},				/* i2c2_scl */
@@ -108,7 +111,10 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{GPMC_NADV_ALE, (M3)},						/* gpio_56 */
 	{GPMC_NBE0_CLE, (M3)},						/* gpio_59 */
 	{GPMC_NBE1, (PTD | M3)},					/* gpio_60 */
+	
+	//Pull down, mode3
 	{GPMC_WAIT0, (PTU | IEN | M3)},					/* gpio_61 */
+	
 	{GPMC_WAIT1,  (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_62 */
 	{C2C_DATA11, (PTD | M3)},					/* gpio_100 */
 	{C2C_DATA12, (PTU | IEN | M3)},					/* gpio_101 */
@@ -168,10 +174,14 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{ABE_DMIC_DIN1, (IEN | M0)},					/* abe_dmic_din1 */
 	{ABE_DMIC_DIN2, (PTU | IEN | M3)},				/* gpio_121 */
 	{ABE_DMIC_DIN3, (IEN | M0)},					/* abe_dmic_din3 */
+
+	//OK
 	{UART2_CTS, (PTU | IEN | M7)},					/* uart2_cts */
 	{UART2_RTS, (M7)},						/* uart2_rts */
 	{UART2_RX, (PTU | IEN | M7)},					/* uart2_rx */
 	{UART2_TX, (M7)},						/* uart2_tx */
+	
+	
 	{HDQ_SIO, (M3)},						/* gpio_127 */
 	{MCSPI1_CLK, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi1_clk */
 	{MCSPI1_SOMI, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi1_somi */
@@ -186,12 +196,20 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{SDMMC5_DAT1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat1 */
 	{SDMMC5_DAT2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat2 */
 	{SDMMC5_DAT3, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* sdmmc5_dat3 */
+	
+	
+	//OK
 	{MCSPI4_CLK, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi4_clk */
 	{MCSPI4_SIMO, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi4_simo */
 	{MCSPI4_SOMI, (IEN | OFF_EN | OFF_PD | OFF_IN | M0)},		/* mcspi4_somi */
 	{MCSPI4_CS0, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},	/* mcspi4_cs0 */
+
+
+	//OK
 	{UART4_RX, (IEN | M0)},						/* uart4_rx */
 	{UART4_TX, (M0)},						/* uart4_tx */
+	
+	
 	{USBB2_ULPITLL_CLK, (IEN | M3)},				/* gpio_157 */
 	{USBB2_ULPITLL_STP, (IEN | M5)},				/* dispc2_data23 */
 	{USBB2_ULPITLL_DIR, (IEN | M5)},				/* dispc2_data22 */
