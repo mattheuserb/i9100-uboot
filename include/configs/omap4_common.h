@@ -55,7 +55,7 @@
 #define V_OSCK			38400000	/* Clock output from T2 */
 #define V_SCLK                   V_OSCK
 
-//#undef CONFIG_USE_IRQ				/* no support for IRQs */
+#undef CONFIG_USE_IRQ				/* no support for IRQs */
 #define CONFIG_MISC_INIT_R
 
 #define CONFIG_OF_LIBFDT		1
@@ -162,7 +162,7 @@
 	"fdt_high=0xffffffff\0" \
 	"usbtty=cdc_acm\0" \
 	"vram=16M\0" \
-	"mmcdev=1\0" \
+	"mmcdev=0\0" \
 	"mmcroot=/dev/mmcblk0p2 rw\0" \
 	"mmcrootfstype=ext3 rootwait\0" \
 	"echo Booting up; " \
@@ -180,6 +180,10 @@
 
 #define CONFIG_BOOTCOMMAND \
 	"setenv usbtty cdc_acm ;" \
+	"setenv stdin usbtty ;" \
+	"setenv stdout usbtty ;" \
+	"setenv stderr usbtty ;" \
+	"saveenv ; " \
 	"echo Booting up ;" \
 	"tuna_print_revision; "\
 	"mmc rescan; " \
