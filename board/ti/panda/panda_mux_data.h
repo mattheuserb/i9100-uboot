@@ -28,21 +28,34 @@
 
 #include <asm/arch/mux_omap4.h>
 
+//input_pullup i2c
+
+//PULL_ENA | PULL_INPUT_EN | OMAP_PULL_UP
+//PULL_ENA 1 << 3
+//PULL_INPUT_EN 1 << 8
+//PULL_UP = 1 << 4
+//IEN | PTU
+//
+
+#define HSMMC1_MUX (PTU | IEN | M0)
+#define HSMMC2_MUX (PTU | IEN | M1)
 
 const struct pad_conf_entry core_padconf_array_essential[] = {
 
-{GPMC_AD0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat0 */
-{GPMC_AD1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat1 */
-{GPMC_AD2, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat2 */
-{GPMC_AD3, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat3 */
-{GPMC_AD4, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat4 */
-{GPMC_AD5, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat5 */
-{GPMC_AD6, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat6 */
-{GPMC_AD7, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_dat7 */
-{GPMC_NOE, (PTU | IEN | OFF_EN | OFF_OUT_PTD | M1)},	 /* sdmmc2_clk */
-{GPMC_NWE, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)}, /* sdmmc2_cmd */
+{GPMC_AD0, HSMMC2_MUX}, /* sdmmc2_dat0 */
+{GPMC_AD1, HSMMC2_MUX}, /* sdmmc2_dat1 */
+{GPMC_AD2, HSMMC2_MUX}, /* sdmmc2_dat2 */
+{GPMC_AD3, HSMMC2_MUX}, /* sdmmc2_dat3 */
+{GPMC_AD4, HSMMC2_MUX}, /* sdmmc2_dat4 */
+{GPMC_AD5, HSMMC2_MUX}, /* sdmmc2_dat5 */
+{GPMC_AD6, HSMMC2_MUX}, /* sdmmc2_dat6 */
+{GPMC_AD7, HSMMC2_MUX}, /* sdmmc2_dat7 */
+{GPMC_NOE, HSMMC2_MUX},	 /* sdmmc2_clk */
+{GPMC_NWE, HSMMC2_MUX}, /* sdmmc2_cmd */
 
 //OK
+
+#if 1
 {SDMMC1_CLK, (PTU | OFF_EN | OFF_OUT_PTD | M0)},	 /* sdmmc1_clk */
 {SDMMC1_CMD, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_cmd */
 {SDMMC1_DAT0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat0 */
@@ -53,6 +66,18 @@ const struct pad_conf_entry core_padconf_array_essential[] = {
 {SDMMC1_DAT5, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat5 */
 {SDMMC1_DAT6, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat6 */
 {SDMMC1_DAT7, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)}, /* sdmmc1_dat7 */
+#else
+{SDMMC1_CLK, HSMMC1_MUX},	 /* sdmmc1_clk */
+{SDMMC1_CMD, HSMMC1_MUX}, /* sdmmc1_cmd */
+{SDMMC1_DAT0, HSMMC1_MUX}, /* sdmmc1_dat0 */
+{SDMMC1_DAT1, HSMMC1_MUX}, /* sdmmc1_dat1 */
+{SDMMC1_DAT2, HSMMC1_MUX}, /* sdmmc1_dat2 */
+{SDMMC1_DAT3, HSMMC1_MUX}, /* sdmmc1_dat3 */
+{SDMMC1_DAT4, HSMMC1_MUX}, /* sdmmc1_dat4 */
+{SDMMC1_DAT5, HSMMC1_MUX}, /* sdmmc1_dat5 */
+{SDMMC1_DAT6, HSMMC1_MUX}, /* sdmmc1_dat6 */
+{SDMMC1_DAT7, HSMMC1_MUX}, /* sdmmc1_dat7 */
+#endif
 
 {I2C1_SCL, (PTU | IEN | M0)},				/* i2c1_scl */
 {I2C1_SDA, (PTU | IEN | M0)},				/* i2c1_sda */
@@ -211,7 +236,10 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	
 	
 	{USBB2_ULPITLL_CLK, (IEN | M3)},				/* gpio_157 */
-	{USBB2_ULPITLL_STP, (IEN | M5)},				/* dispc2_data23 */
+	
+	//{USBB2_ULPITLL_STP, (IEN | M5)},				/* dispc2_data23 */
+	{USBB2_ULPITLL_STP, (EN | M0)},				/* dispc2_data23 */
+	
 	{USBB2_ULPITLL_DIR, (IEN | M5)},				/* dispc2_data22 */
 	{USBB2_ULPITLL_NXT, (IEN | M5)},				/* dispc2_data21 */
 	{USBB2_ULPITLL_DAT0, (IEN | M5)},				/* dispc2_data20 */
@@ -261,7 +289,10 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{DPM_EMU9, (IEN | M5)},						/* dispc2_vsync */
 	{DPM_EMU10, (IEN | M5)},					/* dispc2_de */
 	{DPM_EMU11, (IEN | M5)},					/* dispc2_data8 */
-	{DPM_EMU12, (IEN | M5)},					/* dispc2_data7 */
+	//
+	//{DPM_EMU12, (IEN | M5)},					/* dispc2_data7 */
+	{DPM_EMU12, (EN | M0)},					/* dispc2_data7 */
+	//
 	{DPM_EMU13, (IEN | M5)},					/* dispc2_data6 */
 	{DPM_EMU14, (IEN | M5)},					/* dispc2_data5 */
 	{DPM_EMU15, (IEN | M5)},					/* dispc2_data4 */
@@ -288,7 +319,7 @@ const struct pad_conf_entry wkup_padconf_array_non_essential[] = {
 	{PAD1_FREF_XTAL_IN, (M0)},		/* # */
 	{PAD0_FREF_SLICER_IN, (M0)},		/* fref_slicer_in */
 	{PAD1_FREF_CLK_IOREQ, (M0)},		/* fref_clk_ioreq */
-	{PAD0_FREF_CLK0_OUT, (M2)},		/* sys_drm_msecure */
+	{PAD0_FREF_CLK0_OUT, (M0|EN)},		/* sys_drm_msecure */
 	{PAD1_FREF_CLK3_REQ, M7},		/* safe mode */
 	{PAD0_FREF_CLK3_OUT, (M0)},		/* fref_clk3_out */
 	{PAD0_FREF_CLK4_OUT, (PTU | M3)},	/* led status_2 */

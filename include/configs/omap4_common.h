@@ -38,10 +38,12 @@
 #define CONFIG_OMAP44XX		1	/* which is a 44XX */
 #define CONFIG_OMAP4430		1	/* which is in a 4430 */
 
-#define CONFIG_SKIP_LOWLEVEL_INIT 1
+//#define CONFIG_SKIP_LOWLEVEL_INIT 1
 #define CONFIG_SYS_DCACHE_OFF 1
 #define CONFIG_SYS_ICACHE_OFF 1
 #define CONFIG_SYS_L2CACHE_OFF 1
+
+//#define CONFIG_SYS_OMAP_ABE_SYSCK 1
 
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
