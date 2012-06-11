@@ -168,6 +168,58 @@ U_BOOT_CMD(tuna_print_revision, CONFIG_SYS_MAXARGS, 1, do_tuna_print_revision,
 );
 
 /******************************************************************************
+ * Color led control
+ *****************************************************************************/
+static void tuna_set_led(int color) {
+	u8 val, reg;
+	i2c_set_bus_num(3);
+
+	//reset
+	reg = 0;
+	val = 1;
+	i2c_write(0x30, reg, 1, &val, 1);
+
+	//led select
+	reg = 1;
+	val = color & 7;
+	i2c_write(0x30, reg, 1, &val, 1);
+
+	//led enable
+	reg = 2;
+	val = color & 7;
+	i2c_write(0x30, reg, 1, &val, 1);
+	
+	reg = 3;
+	val = color & 1 ? 0xff : 0;
+	i2c_write(0x30, reg, 1, &val, 1);
+
+	reg = 4;
+	val = color & 2 ? 0xff : 0;
+	i2c_write(0x30, reg, 1, &val, 1);
+
+	reg = 5;
+	val = color & 4 ? 0xff : 0;
+	i2c_write(0x30, reg, 1, &val, 1);
+
+	i2c_set_bus_num(0);
+}
+
+int do_tuna_set_led(cmd_tbl_t *cmdtp, int flag,
+	int argc, char * const argv[])
+{
+	if (argc < 2) {
+		return -1;
+	}
+	tuna_set_led(argv[1][0] - '0');
+	return 0;
+}
+
+U_BOOT_CMD(tuna_set_led, CONFIG_SYS_MAXARGS, 1, do_tuna_set_led,
+	"Set Tuna (Galaxy Nexus) color LEDs\n",
+	"tuna_set_led\n"
+);
+
+/******************************************************************************
  * Framebuffer
  *****************************************************************************/
 #ifdef CONFIG_VIDEO
