@@ -275,6 +275,7 @@ void board_init_f(ulong bootflag)
 	__asm__ __volatile__("": : :"memory");
 
 	memset((void *)gd, 0, sizeof(gd_t));
+	gd->ram_size = 0x100000;
 
 	gd->mon_len = _bss_end_ofs;
 #ifdef CONFIG_OF_EMBED
@@ -309,8 +310,11 @@ void board_init_f(ulong bootflag)
 	 * Ram is setup, size stored in gd !!
 	 */
 	debug("ramsize: %08lX\n", gd->ram_size);
+	//setenv("initramsize", simple_itoa(gd->ram_size));
 	//XXX
-	gd->ram_size = 0x100000;
+	//if (gd->ram_size < (1 << 20)) {
+		gd->ram_size = (256 << 20);
+	//}
 #if defined(CONFIG_SYS_MEM_TOP_HIDE)
 	/*
 	 * Subtract specified amount of memory to hide so that it won't
