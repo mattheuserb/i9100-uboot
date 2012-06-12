@@ -313,7 +313,7 @@ void board_init_f(ulong bootflag)
 	//setenv("initramsize", simple_itoa(gd->ram_size));
 	//XXX
 	//if (gd->ram_size < (1 << 20)) {
-		gd->ram_size = (256 << 20);
+		gd->ram_size = (1024 << 20);
 	//}
 #if defined(CONFIG_SYS_MEM_TOP_HIDE)
 	/*
