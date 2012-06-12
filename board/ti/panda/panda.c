@@ -283,7 +283,10 @@ int board_init(void)
 
 	gd->bd->bi_arch_number = MACH_TYPE_TUNA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
-	gd->ram_size = 0x80000000;
+	gd->ram_size = 0x40000000;
+	
+	gd->bd->bi_dram[0].start = 0x80000000;
+	gd->bd->bi_dram[0].size =  0x40000000;
 	
 	//indicate we're alive
 	tuna_set_led(5);

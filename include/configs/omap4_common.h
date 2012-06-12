@@ -110,7 +110,6 @@
 #define CONFIG_GENERIC_MMC		1
 #define CONFIG_MMC			1
 #define CONFIG_OMAP_HSMMC		1
-//#define CONFIG_DOS_PARTITION		1
 #define CONFIG_EFI_PARTITION		1
 
 /* USB */
@@ -138,6 +137,7 @@
 #define CONFIG_CMD_FAT		/* FAT support                  */
 #define CONFIG_CMD_I2C		/* I2C serial bus support	*/
 #define CONFIG_CMD_MMC		/* MMC support                  */
+#define CONFIG_CMD_BOOTZ
 
 /* Disabled commands */
 #undef CONFIG_CMD_NET
@@ -163,9 +163,9 @@
 	" no_console_suspend" \
 	" console=ttyFIQ0 androidboot.console=ttyFIQ0" \
 	" androidboot.serialno=0A3C202A09011006" \
-	" androidboot.bootloader=UBOOT" \
+	" androidboot.bootloader=PRIMEKK15" \
 	" androidboot.baseband=I9250XXKK1" \
-	" androidboot.macaddr="
+	" androidboot.macaddr=aa:bb:cc:dd:ee:ff"
 
 
 /* mmc partitions
@@ -218,7 +218,7 @@
 		"mmc dev 0; " \
 		"mmc read ${loadaddr} 0x18000 0x6000; "\
 		"echo Command line: ${bootargs}; " \
-		"bootm ${loadaddr}\0" \
+		"bootz ${loadaddr}\0" \
 	\
 	"boot_android=echo Booting ANDROID; " \
 		"tuna_set_led 1; " \
@@ -346,7 +346,11 @@
  *
  */
 
-#define CONFIG_SYS_TEXT_BASE		0x81808000
+#if 0
+	#define CONFIG_SYS_TEXT_BASE		0x81808000
+#else
+	#define CONFIG_SYS_TEXT_BASE		0xa0208000
+#endif
 
 #define CONFIG_SYS_ENABLE_PADS_ALL
 #define CONFIG_SYS_THUMB_BUILD
