@@ -387,7 +387,7 @@ int bootz_setup(void *image, void **start, void **end)
 
 	if (zi->zi_magic != LINUX_ARM_ZIMAGE_MAGIC) {
 		puts("Bad Linux ARM zImage magic!\n");
-		return 1;
+		//return 1;
 	}
 
 	*start = (void *)zi->zi_start;
