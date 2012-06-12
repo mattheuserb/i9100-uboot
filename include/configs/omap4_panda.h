@@ -33,46 +33,21 @@
  */
 #define CONFIG_PANDA	/* working with Panda */
 
-/* USB UHH support options */
-#if 0
-#define CONFIG_CMD_USB
-#define CONFIG_USB_HOST
-#define CONFIG_USB_EHCI
-#define CONFIG_USB_EHCI_OMAP
-#define CONFIG_USB_STORAGE
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS 3
-
-#define CONFIG_OMAP_EHCI_PHY1_RESET_GPIO 1
-#define CONFIG_OMAP_EHCI_PHY2_RESET_GPIO 62
-
-/* USB Networking options */
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_SMSC95XX
-
-#endif
-
 #define CONFIG_UBOOT_ENABLE_PADS_ALL
 
-#define CONFIG_CMD_PING
-#define CONFIG_CMD_DHCP
-
-#if 1
 #define CONFIG_USBD_MANUFACTURER "Samsung"
 #define CONFIG_USBD_PRODUCT_NAME "Galaxy Nexus"
 
 #define CONFIG_USB_ULPI
 #define CONFIG_USB_ULPI_VIEWPORT_OMAP
-#endif
 
 #include <configs/omap4_common.h>
-#define CONFIG_CMD_NET
 
 /* GPIO */
 #define CONFIG_CMD_GPIO
 
 /* ENV related config options */
 #define CONFIG_ENV_IS_NOWHERE
-
 #define CONFIG_SYS_PROMPT		"Galaxy Nexus # "
 
 #endif /* __CONFIG_PANDA_H */

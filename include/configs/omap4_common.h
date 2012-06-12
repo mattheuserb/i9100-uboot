@@ -28,8 +28,6 @@
 #ifndef __CONFIG_OMAP4_COMMON_H
 #define __CONFIG_OMAP4_COMMON_H
 
-#define NEXUS_HACK 1
-
 /*
  * High Level Configuration Options
  */
@@ -43,11 +41,11 @@
 #define CONFIG_SYS_ICACHE_OFF 1
 #define CONFIG_SYS_L2CACHE_OFF 1
 
-//#define CONFIG_SYS_OMAP_ABE_SYSCK 1
-
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
 #include <asm/arch/omap.h>
+
+#define CONFIG_MACH_TYPE		MACH_TYPE_TUNA
 
 /* Display CPU and Board Info */
 #define CONFIG_DISPLAY_CPUINFO		1
@@ -59,8 +57,6 @@
 
 #undef CONFIG_USE_IRQ				/* no support for IRQs */
 #define CONFIG_MISC_INIT_R
-
-#define CONFIG_OF_LIBFDT		1
 
 #define CONFIG_CMDLINE_TAG		1	/* enable passing of ATAGs */
 #define CONFIG_SETUP_MEMORY_TAGS	1
@@ -114,7 +110,7 @@
 #define CONFIG_GENERIC_MMC		1
 #define CONFIG_MMC			1
 #define CONFIG_OMAP_HSMMC		1
-#define CONFIG_DOS_PARTITION		1
+//#define CONFIG_DOS_PARTITION		1
 #define CONFIG_EFI_PARTITION		1
 
 /* USB */
@@ -148,67 +144,125 @@
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_FPGA		/* FPGA configuration Support   */
 #undef CONFIG_CMD_IMLS		/* List all found images        */
+#undef CONFIG_CMD_IMI
+#undef CONFIG_CMD_FLASH
 
 /*
  * Environment setup
  */
 
-#define CONFIG_BOOTDELAY	3
+#define CONFIG_BOOTDELAY	0
+#define CONFIG_ZERO_BOOTDELAY_CHECK
 
 #define CONFIG_ENV_OVERWRITE
 
+#define ANDROID_CMDLINE " mem=1G vmalloc=768M" \
+	" lcd_bootfb=0xbea70000" \
+	" omap_wdt.timer_margin=30" \
+	" mms_ts.panel_id=18" \
+	" no_console_suspend" \
+	" console=ttyFIQ0 androidboot.console=ttyFIQ0" \
+	" androidboot.serialno=0A3C202A09011006" \
+	" androidboot.bootloader=UBOOT" \
+	" androidboot.baseband=I9250XXKK1" \
+	" androidboot.macaddr="
+
+
+/* mmc partitions
+ * 7 -> boot 0x14000 0x4000
+ * 8 -> recovery 0x18000 0x6000
+ * 10 -> system
+ * 12 -> userdata
+ */
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	\
+	"loadaddr=0x80008000\0" \
 	"usbtty=cdc_acm\0" \
-	"loadaddr=0x82000000\0" \
-	"console=ttyO2,115200n8\0" \
-	"fdt_high=0xffffffff\0" \
-	"usbtty=cdc_acm\0" \
-	"vram=16M\0" \
-	"mmcdev=0\0" \
-	"mmcroot=/dev/mmcblk0p2 rw\0" \
-	"mmcrootfstype=ext3 rootwait\0" \
-	"echo Booting up; " \
-	"mmcargs=setenv bootargs console=${console} " \
-		"vram=${vram} " \
-		"root=${mmcroot} " \
-		"rootfstype=${mmcrootfstype}\0" \
-	"loadbootscript=fatload mmc ${mmcdev} ${loadaddr} boot.scr\0" \
-	"bootscript=echo Running bootscript from mmc${mmcdev} ...; " \
-		"source ${loadaddr}\0" \
-	"loaduimage=fatload mmc ${mmcdev} ${loadaddr} uImage\0" \
-	"mmcboot=echo Booting from mmc${mmcdev} ...; " \
-		"run mmcargs; " \
+	"kernel_name=/boot/vmlinux.uimg\0" \
+	"script_img/boot/boot.scr.uimg\0" \
+	\
+	"load_boot_script=if fatload ${devtype} ${devnum}:${script_part} " \
+			"${loadaddr} ${script_img}; then " \
+			"source ${loadaddr}; " \
+		"elif ext2load ${devtype} ${devnum}:${script_part} " \
+				"${loadaddr} ${script_img}; then " \
+			"source ${loadaddr}; " \
+		"fi\0" \
+	\
+	"custom_boot=setenv bootargs "\
+			"${dev_extras} root=/dev/${devname}${rootpart} rootwait ro ;"\
+		"echo Load Address:${loadaddr};" \
+		"echo Cmdline:${bootargs}; " \
+		"if fatload ${devtype} ${devnum}:${kernel_part} " \
+			"${loadaddr} ${kernel_name}; then " \
+			"bootm ${loadaddr}; " \
+		"elif ext2load ${devtype} ${devnum}:${kernel_part} " \
+		            "${loadaddr} ${kernel_name}; then " \
+			"bootm ${loadaddr};" \
+		"fi\0" \
+	\
+	"boot_custom_emmc=echo Booting custom image; " \
+		"tuna_set_led 4; " \
+		"setenv script_part 0xc; " \
+		"setenv kernel_part 0xc; " \
+		"setenv rootpart 0xc; " \
+		"setenv devnum 0; " \
+		"setenv devtype mmc; " \
+		"run load_boot_script; " \
+		"run custom_boot\0" \
+	\
+	"boot_recovery=echo Booting RECOVERY; " \
+		"tuna_set_led 2; " \
+		"setenv bootargs " ANDROID_CMDLINE " ; " \
+		"mmc dev 0; " \
+		"mmc read ${loadaddr} 0x18000 0x6000; "\
+		"echo Command line: ${bootargs}; " \
 		"bootm ${loadaddr}\0" \
+	\
+	"boot_android=echo Booting ANDROID; " \
+		"tuna_set_led 1; " \
+		"setenv bootargs " ANDROID_CMDLINE " ; " \
+		"mmc dev 0" \
+		"mmc read ${loadaddr} 0x14000 0x4000; "\
+		"echo Command line: ${bootargs}; " \
+		"bootm ${loadaddr}\0" \
+	\
+	"go_usbtty=setenv stdin usbtty; " \
+		"setenv stdout usbtty; " \
+		"setenv stderr usbtty; " \
+		"tuna_set_led 3\0" \
+	\
+	"tuna_boot=mmc rescan; " \
+		"mmc dev 0; " \
+		"mmc part; " \
+		"tuna_get_bootmode; " \
+		"if test $tuna_bootmode_val -eq 0; then " \
+			"echo Regular boot; " \
+			"run go_usbtty; " \
+			"exit 0; " \
+		"elif test $tuna_bootmode_val -eq 1; then " \
+			"echo Recovery boot; " \
+			"run boot_recovery; " \
+		"else; " \
+			"echo Custom boot from userdata; " \
+			"run boot_custom_emmc; " \
+		"fi; " \
+		"tuna_set_led 7; " \
+		"echo Failed to boot\0"
 
 #define CONFIG_BOOTCOMMAND \
-	"setenv usbtty cdc_acm ;" \
-	"setenv stdin usbtty ;" \
-	"setenv stdout usbtty ;" \
-	"setenv stderr usbtty ;" \
-	"saveenv ; " \
 	"echo Booting up ;" \
-	"tuna_print_revision; "\
-	"mmc rescan; " \
-	"mmc list; " \
-	"mmc part 0; " \
-	"mmc part 1; " \
-	"if mmc rescan ${mmcdev}; then " \
-		"if run loadbootscript; then " \
-			"run bootscript; " \
-		"else " \
-			"if run loaduimage; then " \
-				"run mmcboot; " \
-			"fi; " \
-		"fi; " \
-	"fi"
-
-#define CONFIG_AUTO_COMPLETE		1
+	"tuna_get_bootmode; "\
+	"echo [Tuna] bootmode $tuna_bootmode_val; " \
+	"tuna_print_revision ; " \
+	"run tuna_boot ;"
 
 /*
  * Miscellaneous configurable options
  */
-
-#define CONFIG_SYS_LONGHELP	/* undef to save memory */
+#define CONFIG_AUTO_COMPLETE 1
+#define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_HUSH_PARSER	/* use "hush" command parser */
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #define CONFIG_SYS_CBSIZE		512
@@ -273,21 +327,13 @@
 #define CONFIG_SYS_DEFAULT_LPDDR2_TIMINGS
 #endif
 
-/* Defines for SPL */
-#if !NEXUS_HACK
-	#define CONFIG_SPL
-	#define CONFIG_SPL_TEXT_BASE		0x40304350
-	#define CONFIG_SPL_MAX_SIZE		(38 * 1024)
-	#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
-#endif
-
 #define CONFIG_VIDEO
 #define CONFIG_CFB_CONSOLE
 #define CONFIG_VGA_AS_SINGLE_DEVICE
 
-#define CONFIG_STD_DEVICES_SETTINGS "stdin=usbtty\0" \
-									"stdout=vga,usbtty\0" \
-									"stderr=vga,usbtty\0"
+#define CONFIG_STD_DEVICES_SETTINGS "stdin=vga\0" \
+									"stdout=vga\0" \
+									"stderr=vga\0"
 
 /*
  * 64 bytes before this address should be set aside for u-boot.img's
@@ -295,41 +341,14 @@
  * other needs.
  */
 
-#if !NEXUS_HACK
-	#define CONFIG_SYS_TEXT_BASE		0x80E80000
-#else
-	//#define CONFIG_SYS_TEXT_BASE		0x80008000
-	#define CONFIG_SYS_TEXT_BASE		0x81808000
-#endif
+/*
+ * Samsung xloader loads SBL at 0xa0208000
+ *
+ */
 
-#ifdef CONFIG_SPL
-	/*
-	 * BSS and malloc area 64MB into memory to allow enough
-	 * space for the kernel at the beginning of memory
-	 */
-	#define CONFIG_SPL_BSS_START_ADDR	0x84000000
-	#define CONFIG_SPL_BSS_MAX_SIZE		0x100000	/* 1 MB */
-	#define CONFIG_SYS_SPL_MALLOC_START	0x84100000
-	#define CONFIG_SYS_SPL_MALLOC_SIZE	0x100000	/* 1 MB */
+#define CONFIG_SYS_TEXT_BASE		0x81808000
 
-	#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300 /* address 0x60000 */
-	#define CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS	0x200 /* 256 KB */
-	#define CONFIG_SYS_MMC_SD_FAT_BOOT_PARTITION	1
-	#define CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME	"u-boot.img"
-
-	#define CONFIG_SPL_LIBCOMMON_SUPPORT
-	#define CONFIG_SPL_LIBDISK_SUPPORT
-	#define CONFIG_SPL_I2C_SUPPORT
-	#define CONFIG_SPL_MMC_SUPPORT
-	#define CONFIG_SPL_FAT_SUPPORT
-	#define CONFIG_SPL_LIBGENERIC_SUPPORT
-	#define CONFIG_SPL_SERIAL_SUPPORT
-	#define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/omap-common/u-boot-spl.lds"
-#endif
-
-#if 1
-	#define CONFIG_SYS_ENABLE_PADS_ALL
-	#define CONFIG_SYS_THUMB_BUILD
-#endif
+#define CONFIG_SYS_ENABLE_PADS_ALL
+#define CONFIG_SYS_THUMB_BUILD
 
 #endif /* __CONFIG_OMAP4_COMMON_H */

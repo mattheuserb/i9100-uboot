@@ -281,7 +281,7 @@ int board_init(void)
 	set_muxconf_regs_essential();
 	gpmc_init();
 
-	gd->bd->bi_arch_number = MACH_TYPE_OMAP4_PANDA;
+	gd->bd->bi_arch_number = MACH_TYPE_TUNA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
 	gd->ram_size = 0x80000000;
 	
