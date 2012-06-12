@@ -220,6 +220,31 @@ U_BOOT_CMD(tuna_set_led, CONFIG_SYS_MAXARGS, 1, do_tuna_set_led,
 );
 
 /******************************************************************************
+ * Getting boot reason
+ *****************************************************************************/
+
+int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
+	int argc, char * const argv[])
+{
+	gpio_direction_input(30);
+	int volup = !gpio_get_value(30);
+	
+	gpio_direction_input(8);
+	int voldown = !gpio_get_value(8);
+
+	int rc = (voldown << 1) | volup;
+	setenv("tuna_bootmode_val", simple_itoa(rc));
+	return 0;
+}
+
+U_BOOT_CMD(tuna_get_bootmode, CONFIG_SYS_MAXARGS, 1, do_tuna_get_bootmode,
+	"Get Tuna (Galaxy Nexus) boot mode\n"
+	"Bit 0 -> recovery\n"
+	"Bit 1 -> custom kernel",
+	"tuna_get_bootmode\n"
+);
+
+/******************************************************************************
  * Framebuffer
  *****************************************************************************/
 #ifdef CONFIG_VIDEO

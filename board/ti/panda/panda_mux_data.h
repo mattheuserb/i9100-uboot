@@ -28,6 +28,8 @@
 
 #include <asm/arch/mux_omap4.h>
 
+#define MUX_GPIO_IN3 (PTU | IEN | M3)
+
 const struct pad_conf_entry core_padconf_array_essential[] = {
 //OK
 {SDMMC1_CLK, (PTU | OFF_EN | OFF_OUT_PTD | M0)},	 /* sdmmc1_clk */
@@ -118,10 +120,17 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{CSI21_DY1, (IEN | M0)},					/* csi21_dy1 */
 	{CSI21_DX2, (IEN | M0)},					/* csi21_dx2 */
 	{CSI21_DY2, (IEN | M0)},					/* csi21_dy2 */
-	{CSI21_DX3, (PTD | M7)},					/* csi21_dx3 */
-	{CSI21_DY3, (PTD | M7)},					/* csi21_dy3 */
-	{CSI21_DX4, (PTD | OFF_EN | OFF_PD | OFF_IN | M7)},		/* csi21_dx4 */
-	{CSI21_DY4, (PTD | OFF_EN | OFF_PD | OFF_IN | M7)},		/* csi21_dy4 */
+	
+	//tuna board id pins
+	{CSI21_DY3, MUX_GPIO_IN3},
+	{CSI21_DX3, MUX_GPIO_IN3},
+	{CSI21_DX4, MUX_GPIO_IN3},
+	{CSI21_DY4, MUX_GPIO_IN3},
+
+	//{CSI21_DX3, (PTD | M7)},					/* csi21_dx3 */
+	//{CSI21_DY3, (PTD | M7)},					/* csi21_dy3 */
+	//{CSI21_DX4, (PTD | OFF_EN | OFF_PD | OFF_IN | M7)},		/* csi21_dx4 */
+	//{CSI21_DY4, (PTD | OFF_EN | OFF_PD | OFF_IN | M7)},		/* csi21_dy4 */
 	{CSI22_DX0, (IEN | M0)},					/* csi22_dx0 */
 	{CSI22_DY0, (IEN | M0)},					/* csi22_dy0 */
 	{CSI22_DX1, (IEN | M0)},					/* csi22_dx1 */
@@ -213,7 +222,11 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{USBB2_ULPITLL_DAT6, (IEN | M5)},				/* dispc2_data12 */
 	{USBB2_ULPITLL_DAT7, (IEN | M5)},				/* dispc2_data11 */
 	{USBB2_HSIC_DATA, (PTD | OFF_EN | OFF_OUT_PTU | M3)},		/* gpio_169 */
-	{USBB2_HSIC_STROBE, (PTD | OFF_EN | OFF_OUT_PTU | M3)},		/* gpio_170 */
+	
+	//tuna board id pin
+	{USBB2_HSIC_STROBE, MUX_GPIO_IN3},
+	//{USBB2_HSIC_STROBE, (PTD | OFF_EN | OFF_OUT_PTU | M3)},		/* gpio_170 */
+	
 	{UNIPRO_TX0, (PTD | IEN | M3)},					/* gpio_171 */
 	{UNIPRO_TY0, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col1 */
 	{UNIPRO_TX1, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col2 */
@@ -282,9 +295,9 @@ const struct pad_conf_entry wkup_padconf_array_non_essential[] = {
 	{PAD0_FREF_SLICER_IN, (M0)},		/* fref_slicer_in */
 	{PAD1_FREF_CLK_IOREQ, (M0)},		/* fref_clk_ioreq */
 	{PAD0_FREF_CLK0_OUT, (M0|EN)},		/* sys_drm_msecure */
-	{PAD1_FREF_CLK3_REQ, M7},		/* safe mode */
+	{PAD1_FREF_CLK3_REQ, MUX_GPIO_IN3},		/* safe mode - volume up key */
 	{PAD0_FREF_CLK3_OUT, (M0)},		/* fref_clk3_out */
-	{PAD0_FREF_CLK4_OUT, (PTU | M3)},	/* led status_2 */
+	{PAD0_FREF_CLK4_OUT, MUX_GPIO_IN3},	/* led status_2 - volume down key */
 	{PAD0_SYS_NRESPWRON, (M0)},		/* sys_nrespwron */
 	{PAD1_SYS_NRESWARM, (M0)},		/* sys_nreswarm */
 	{PAD0_SYS_PWR_REQ, (PTU | M0)},		/* sys_pwr_req */
