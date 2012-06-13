@@ -36,6 +36,8 @@
 #define CONFIG_OMAP44XX		1	/* which is a 44XX */
 #define CONFIG_OMAP4430		1	/* which is in a 4430 */
 
+//define TUNA_SPL_BUILD
+
 //#define CONFIG_SKIP_LOWLEVEL_INIT 1
 #define CONFIG_SYS_DCACHE_OFF 1
 #define CONFIG_SYS_ICACHE_OFF 1
@@ -346,7 +348,7 @@
  *
  */
 
-#if 0
+#ifndef TUNA_SPL_BUILD
 	#define CONFIG_SYS_TEXT_BASE		0x81808000
 #else
 	#define CONFIG_SYS_TEXT_BASE		0xa0208000
