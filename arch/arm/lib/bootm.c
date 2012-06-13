@@ -101,7 +101,7 @@ static void announce_and_cleanup(void)
 #endif
 
 #ifdef CONFIG_USB_DEVICE
-	udc_disconnect();
+	//udc_disconnect();
 #endif
 
 #ifdef CONFIG_DRIVER_OMAP34XX_I2C
