@@ -156,7 +156,7 @@ int do_tuna_print_revision(cmd_tbl_t *cmdtp, int flag,
 	gnex_get_revision();
 	const char *rev_name = omap4_tuna_hw_rev_name();
 	if (!rev_name) {
-		return;
+		return -1;
 	}
 	printf("Tuna revision %d: %s\n", tuna_hw_rev, rev_name);
 	return 0;
@@ -166,6 +166,14 @@ U_BOOT_CMD(tuna_print_revision, CONFIG_SYS_MAXARGS, 1, do_tuna_print_revision,
 	"Print Tuna (Galaxy Nexus) revision\n",
 	"tuna_print_revision\n"
 );
+
+/******************************************************************************
+ * Serial ATAG
+ *****************************************************************************/
+void get_board_serial(struct tag_serialnr *serialnr) {
+	serialnr->low = 0;
+	serialnr->high = 0;
+}
 
 /******************************************************************************
  * Color led control

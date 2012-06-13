@@ -64,6 +64,7 @@
 #define CONFIG_SETUP_MEMORY_TAGS	1
 #define CONFIG_INITRD_TAG		1
 #define CONFIG_REVISION_TAG		1
+#define CONFIG_SERIAL_TAG	1
 
 /*
  * Size of malloc() pool
@@ -129,7 +130,7 @@
 #define CONFIG_SYS_NO_FLASH	1
 
 /* clocks */
-//#define CONFIG_SYS_CLOCKS_ENABLE_ALL
+#define CONFIG_SYS_CLOCKS_ENABLE_ALL
 
 /* commands to include */
 #include <config_cmd_default.h>
@@ -282,7 +283,7 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + (32 << 20))
 
 /* Default load address */
-#define CONFIG_SYS_LOAD_ADDR		0x81000000
+#define CONFIG_SYS_LOAD_ADDR		0x80008000
 
 /* Use General purpose timer 1 */
 #define CONFIG_SYS_TIMERBASE		GPT2_BASE
