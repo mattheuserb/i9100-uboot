@@ -227,7 +227,7 @@
 		"mmc dev 0" \
 		"mmc read ${loadaddr} 0x14000 0x4000; "\
 		"echo Command line: ${bootargs}; " \
-		"bootm ${loadaddr}\0" \
+		"bootz ${loadaddr}\0" \
 	\
 	"go_usbtty=setenv stdin usbtty; " \
 		"setenv stdout usbtty; " \
@@ -238,18 +238,18 @@
 		"mmc dev 0; " \
 		"mmc part; " \
 		"tuna_get_bootmode; " \
-		"if test $tuna_bootmode_val -eq 1; then " \
+		"if test $tuna_bootmode_val -eq 0; then " \
 			"echo Regular boot; " \
-			"run go_usbtty; " \
-			"exit 0; " \
-		"elif test $tuna_bootmode_val -eq 0; then " \
+			"run boot_android; " \
+		"elif test $tuna_bootmode_val -eq 1; then " \
 			"echo Recovery boot; " \
 			"run boot_recovery; " \
-		"else; " \
+		"elif test $tuna_bootmode_val -eq 3; then " \
 			"echo Custom boot from userdata; " \
 			"run boot_custom_emmc; " \
 		"fi; " \
 		"tuna_set_led 7; " \
+		"run go_usbtty; " \
 		"echo Failed to boot\0"
 
 #define CONFIG_BOOTCOMMAND \
