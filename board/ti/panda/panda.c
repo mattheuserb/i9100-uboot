@@ -172,6 +172,9 @@ U_BOOT_CMD(tuna_print_revision, CONFIG_SYS_MAXARGS, 1, do_tuna_print_revision,
  *****************************************************************************/
 static void tuna_set_led(int color) {
 	u8 val, reg;
+
+	return;
+	tuna_clear_i2c4();
 	i2c_set_bus_num(3);
 
 	//reset
@@ -420,7 +423,9 @@ int board_mmc_init(bd_t *bis)
 	gpio_direction_output(158, 1);
 	gpio_set_value(158, 1);
 
+#if 0
 	i2c_set_bus_num(0);
+#endif
 	omap_mmc_init(0, 0, 0);
 	return 0;
 }

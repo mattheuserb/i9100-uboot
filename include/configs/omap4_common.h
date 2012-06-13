@@ -103,7 +103,7 @@
 
 /* TWL6030 */
 //#ifndef CONFIG_SPL_BUILD
-#define CONFIG_TWL6030_POWER		1
+//#define CONFIG_TWL6030_POWER		1
 //#endif
 
 /* MMC */
@@ -127,7 +127,7 @@
 #define CONFIG_SYS_NO_FLASH	1
 
 /* clocks */
-//#define CONFIG_SYS_CLOCKS_ENABLE_ALL
+#define CONFIG_SYS_CLOCKS_ENABLE_ALL
 
 /* commands to include */
 #include <config_cmd_default.h>
