@@ -224,7 +224,7 @@
 	"boot_android=echo Booting ANDROID; " \
 		"tuna_set_led 1; " \
 		"setenv bootargs " ANDROID_CMDLINE " ; " \
-		"mmc dev 0" \
+		"mmc dev 0; " \
 		"mmc read ${loadaddr} 0x14000 0x4000; "\
 		"echo Command line: ${bootargs}; " \
 		"bootz ${loadaddr}\0" \
