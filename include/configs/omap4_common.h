@@ -36,12 +36,12 @@
 #define CONFIG_OMAP44XX		1	/* which is a 44XX */
 #define CONFIG_OMAP4430		1	/* which is in a 4430 */
 
-//define TUNA_SPL_BUILD
+#define TUNA_SPL_BUILD
 
 //#define CONFIG_SKIP_LOWLEVEL_INIT 1
-#define CONFIG_SYS_DCACHE_OFF 1
-#define CONFIG_SYS_ICACHE_OFF 1
-#define CONFIG_SYS_L2CACHE_OFF 1
+//#define CONFIG_SYS_DCACHE_OFF 1
+//#define CONFIG_SYS_ICACHE_OFF 1
+//#define CONFIG_SYS_L2CACHE_OFF 1
 
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
@@ -158,7 +158,6 @@
 #define CONFIG_ENV_OVERWRITE
 
 #define ANDROID_CMDLINE " mem=1G vmalloc=768M" \
-	" lcd_bootfb=0xbea70000" \
 	" omap_wdt.timer_margin=30" \
 	" mms_ts.panel_id=18" \
 	" no_console_suspend" \
