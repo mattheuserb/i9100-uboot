@@ -244,12 +244,15 @@
 		"elif test $tuna_bootmode_val -eq 1; then " \
 			"echo Recovery boot; " \
 			"run boot_recovery; " \
-		"elif test $tuna_bootmode_val -eq 3; then " \
+		"elif test $tuna_bootmode_val -eq 2; then " \
 			"echo Custom boot from userdata; " \
 			"run boot_custom_emmc; " \
+		"elif test $tuna_bootmode_val -eq 3; then " \
+			"echo USB TTY mode; " \
+			"run go_usbtty; " \
+			"exit 0; " \
 		"fi; " \
 		"tuna_set_led 7; " \
-		"run go_usbtty; " \
 		"echo Failed to boot\0"
 
 #define CONFIG_BOOTCOMMAND \
