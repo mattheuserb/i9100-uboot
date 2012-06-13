@@ -237,11 +237,11 @@
 		"mmc dev 0; " \
 		"mmc part; " \
 		"tuna_get_bootmode; " \
-		"if test $tuna_bootmode_val -eq 0; then " \
+		"if test $tuna_bootmode_val -eq 1; then " \
 			"echo Regular boot; " \
 			"run go_usbtty; " \
 			"exit 0; " \
-		"elif test $tuna_bootmode_val -eq 1; then " \
+		"elif test $tuna_bootmode_val -eq 0; then " \
 			"echo Recovery boot; " \
 			"run boot_recovery; " \
 		"else; " \
@@ -280,7 +280,7 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + (32 << 20))
 
 /* Default load address */
-#define CONFIG_SYS_LOAD_ADDR		0x81000000
+#define CONFIG_SYS_LOAD_ADDR		0x80008000
 
 /* Use General purpose timer 1 */
 #define CONFIG_SYS_TIMERBASE		GPT2_BASE
@@ -346,7 +346,7 @@
  *
  */
 
-#if 0
+#if 1
 	#define CONFIG_SYS_TEXT_BASE		0x81808000
 #else
 	#define CONFIG_SYS_TEXT_BASE		0xa0208000
