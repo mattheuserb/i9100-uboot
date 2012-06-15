@@ -151,22 +151,15 @@
 /*
  * Environment setup
  */
-
 #define CONFIG_BOOTDELAY	0
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-
 #define CONFIG_ENV_OVERWRITE
 
 #define ANDROID_CMDLINE " mem=1G vmalloc=768M" \
 	" omap_wdt.timer_margin=30" \
 	" mms_ts.panel_id=18" \
 	" no_console_suspend" \
-	" console=ttyFIQ0 androidboot.console=ttyFIQ0" \
-	" androidboot.serialno=0A3C202A09011006" \
-	" androidboot.bootloader=PRIMEKK15" \
-	" androidboot.baseband=I9250XXKK1" \
-	" androidboot.macaddr=aa:bb:cc:dd:ee:ff"
-
+	" console=ttyFIQ0 "
 
 /* mmc partitions
  * 7 -> boot 0x14000 0x4000
@@ -330,13 +323,18 @@
 #define CONFIG_SYS_DEFAULT_LPDDR2_TIMINGS
 #endif
 
-#define CONFIG_VIDEO
-#define CONFIG_CFB_CONSOLE
-#define CONFIG_VGA_AS_SINGLE_DEVICE
-
-#define CONFIG_STD_DEVICES_SETTINGS "stdin=vga\0" \
+#ifndef TUNA_SPL_BUILD
+	#define CONFIG_VIDEO
+	#define CONFIG_CFB_CONSOLE
+	#define CONFIG_VGA_AS_SINGLE_DEVICE
+	#define CONFIG_STD_DEVICES_SETTINGS "stdin=vga\0" \
 									"stdout=vga\0" \
 									"stderr=vga\0"
+#else
+	#define CONFIG_STD_DEVICES_SETTINGS "stdin=usbtty\0" \
+									"stdout=usbtty\0" \
+									"stderr=usbtty\0"
+#endif
 
 /*
  * 64 bytes before this address should be set aside for u-boot.img's
