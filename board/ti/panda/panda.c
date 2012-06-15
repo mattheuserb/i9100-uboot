@@ -288,6 +288,12 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 		tuna_check_bootflag();
 	}
 
+#if defined(CONFIG_TWL6030_POWER)
+	if (tuna_bootmode == BOOTMODE_POWEROFF) {
+		twl6030_system_shutdown();
+	}
+#endif
+
 	setenv("tuna_bootmode_val", simple_itoa(tuna_bootmode));
 	return 0;
 }
