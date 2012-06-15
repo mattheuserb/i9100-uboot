@@ -232,6 +232,46 @@ U_BOOT_CMD(tuna_set_led, CONFIG_SYS_MAXARGS, 1, do_tuna_set_led,
 /******************************************************************************
  * Getting boot reason
  *****************************************************************************/
+//These are the values the kernel sets the bootflag register to on reboot */
+#define REBOOT_FLAG_RECOVERY	0x52564352
+#define REBOOT_FLAG_FASTBOOT	0x54534146
+#define REBOOT_FLAG_NORMAL	0x4D524F4E
+#define REBOOT_FLAG_POWER_OFF	0x46464F50
+
+/* this is the register to store boot mode which is preserved over a reboot */
+#define SAMSUNG_BOOTFLAG_ADDR 0x4a326ff4
+
+enum bootmode {
+	BOOTMODE_NORMAL,
+	BOOTMODE_RECOVERY,
+	BOOTMODE_CUSTOM,
+	BOOTMODE_USBDEBUG,
+	BOOTMODE_POWEROFF,
+	BOOTMODE_UNKNOWN,
+};
+
+static enum bootmode tuna_bootmode = BOOTMODE_UNKNOWN;
+
+static void tuna_check_bootflag(void) {
+	unsigned flag;
+
+	flag = readl(SAMSUNG_BOOTFLAG_ADDR);
+
+	switch (flag) {
+		case REBOOT_FLAG_RECOVERY:
+			tuna_bootmode = BOOTMODE_RECOVERY;
+			break;
+		case REBOOT_FLAG_NORMAL:
+			tuna_bootmode = BOOTMODE_NORMAL;
+			break;
+		case REBOOT_FLAG_FASTBOOT:
+			tuna_bootmode = BOOTMODE_USBDEBUG;
+			break;
+		case REBOOT_FLAG_POWER_OFF:	
+			tuna_bootmode = BOOTMODE_POWEROFF;
+			break;
+	}
+}
 
 int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 	int argc, char * const argv[])
@@ -241,9 +281,14 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 	
 	gpio_direction_input(8);
 	int voldown = !gpio_get_value(8);
+	
+	tuna_bootmode = (voldown << 1) | volup;
 
-	int rc = (voldown << 1) | volup;
-	setenv("tuna_bootmode_val", simple_itoa(rc));
+	if (tuna_bootmode == BOOTMODE_NORMAL) {
+		tuna_check_bootflag();
+	}
+
+	setenv("tuna_bootmode_val", simple_itoa(tuna_bootmode));
 	return 0;
 }
 
@@ -300,6 +345,8 @@ int board_init(void)
 	
 	//indicate we're alive
 	tuna_set_led(5);
+
+	tuna_check_bootflag();
 
 	return 0;
 }
