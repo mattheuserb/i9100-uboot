@@ -128,7 +128,9 @@
 #define CONFIG_SYS_NO_FLASH	1
 
 /* clocks */
+#if 0
 #define CONFIG_SYS_CLOCKS_ENABLE_ALL
+#endif
 
 /* commands to include */
 #include <config_cmd_default.h>
