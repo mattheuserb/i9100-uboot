@@ -157,6 +157,8 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_ENV_OVERWRITE
 
+#define CONFIG_ANDROID_BOOT_IMAGE
+
 #define ANDROID_CMDLINE " mem=1G vmalloc=768M" \
 	" omap_wdt.timer_margin=30" \
 	" mms_ts.panel_id=18" \
@@ -213,7 +215,7 @@
 		"mmc dev 0; " \
 		"mmc read ${loadaddr} 0x18000 0x6000; "\
 		"echo Command line: ${bootargs}; " \
-		"bootz ${loadaddr}\0" \
+		"bootm ${loadaddr}\0" \
 	\
 	"boot_android=echo Booting ANDROID; " \
 		"tuna_set_led 1; " \
