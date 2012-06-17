@@ -1030,6 +1030,14 @@ int boot_get_ramdisk(int argc, char * const argv[], bootm_headers_t *images,
 				(ulong)images->legacy_hdr_os);
 
 		image_multi_getimg(images->legacy_hdr_os, 1, &rd_data, &rd_len);
+	} else {
+		/*
+		 * no initrd image
+		 */
+		bootstage_mark(BOOTSTAGE_ID_NO_RAMDISK);
+		rd_len = rd_data = 0;
+	}
+
 #ifdef CONFIG_ANDROID_BOOT_IMAGE
 	if (images->ahdr && images->ahdr->ramdisk_size) {
 		rd_data = (unsigned long)images->ahdr;
@@ -1038,13 +1046,6 @@ int boot_get_ramdisk(int argc, char * const argv[], bootm_headers_t *images,
 		rd_len = images->ahdr->ramdisk_size;
 	}
 #endif
-	} else {
-		/*
-		 * no initrd image
-		 */
-		bootstage_mark(BOOTSTAGE_ID_NO_RAMDISK);
-		rd_len = rd_data = 0;
-	}
 
 	if (!rd_data) {
 		debug("## No init Ramdisk\n");
