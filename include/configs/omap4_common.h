@@ -140,7 +140,6 @@
 #define CONFIG_CMD_FAT		/* FAT support                  */
 #define CONFIG_CMD_I2C		/* I2C serial bus support	*/
 #define CONFIG_CMD_MMC		/* MMC support                  */
-#define CONFIG_CMD_BOOTZ
 
 /* Disabled commands */
 #undef CONFIG_CMD_NET
@@ -223,7 +222,7 @@
 		"mmc dev 0; " \
 		"mmc read ${loadaddr} 0x14000 0x4000; "\
 		"echo Command line: ${bootargs}; " \
-		"bootz ${loadaddr}\0" \
+		"bootm ${loadaddr}\0" \
 	\
 	"go_usbtty=setenv stdin usbtty; " \
 		"setenv stdout usbtty; " \
