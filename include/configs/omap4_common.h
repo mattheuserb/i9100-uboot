@@ -174,7 +174,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	\
-	"loadaddr=0x80008000\0" \
+	"loadaddr=0x82000000\0" \
 	"usbtty=cdc_acm\0" \
 	"kernel_name=/boot/vmlinux.uimg\0" \
 	"script_img/boot/boot.scr.uimg\0" \
@@ -215,7 +215,7 @@
 		"mmc dev 0; " \
 		"mmc read ${loadaddr} 0x18000 0x6000; "\
 		"echo Command line: ${bootargs}; " \
-		"bootz ${loadaddr}\0" \
+		"bootm ${loadaddr}\0" \
 	\
 	"boot_android=echo Booting ANDROID; " \
 		"tuna_set_led 1; " \
@@ -223,7 +223,7 @@
 		"mmc dev 0; " \
 		"mmc read ${loadaddr} 0x14000 0x4000; "\
 		"echo Command line: ${bootargs}; " \
-		"bootz ${loadaddr}\0" \
+		"bootm ${loadaddr}\0" \
 	\
 	"go_usbtty=setenv stdin usbtty; " \
 		"setenv stdout usbtty; " \
@@ -280,7 +280,7 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + (32 << 20))
 
 /* Default load address */
-#define CONFIG_SYS_LOAD_ADDR		0x80008000
+#define CONFIG_SYS_LOAD_ADDR		0x82000000
 
 /* Use General purpose timer 1 */
 #define CONFIG_SYS_TIMERBASE		GPT2_BASE
