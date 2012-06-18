@@ -1,4 +1,8 @@
 /*
+ * (C) Copyright 2012
+ * Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ *
+ * based on panda board which is
  * (C) Copyright 2010
  * Texas Instruments Incorporated, <www.ti.com>
  * Steve Sakoman  <steve@sakoman.com>
@@ -30,7 +34,7 @@
 #include <asm/arch/gpio.h>
 #include <asm/gpio.h>
 
-#include "panda_mux_data.h"
+#include "tuna_mux_data.h"
 
 #ifdef CONFIG_USB_EHCI
 #include <usb.h>

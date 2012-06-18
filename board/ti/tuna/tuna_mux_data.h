@@ -1,4 +1,8 @@
 /*
+ * (C) Copyright 2012
+ * Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ *
+ * based on panda board which is
  * (C) Copyright 2010
  * Texas Instruments Incorporated, <www.ti.com>
  *
@@ -23,8 +27,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
-#ifndef _PANDA_MUX_DATA_H_
-#define _PANDA_MUX_DATA_H_
+#ifndef _TUNA_MUX_DATA_H_
+#define _TUNA_MUX_DATA_H_
 
 #include <asm/arch/mux_omap4.h>
 
@@ -310,4 +314,4 @@ const struct pad_conf_entry wkup_padconf_array_non_essential_4430[] = {
 	{PAD1_FREF_CLK4_REQ, (PTU | M3)},	/* led status_1 */
 };
 
-#endif /* _PANDA_MUX_DATA_H_ */
+#endif /* _TUNA_MUX_DATA_H_ */
