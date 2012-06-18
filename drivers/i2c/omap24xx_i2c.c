@@ -423,20 +423,27 @@ static u16 wait_for_pin(void)
 
 int i2c_set_bus_num(unsigned int bus)
 {
-	if ((bus < 0) || (bus >= I2C_BUS_MAX)) {
-		printf("Bad bus: %d\n", bus);
-		return -1;
-	}
-
-#if I2C_BUS_MAX == 3
-	if (bus == 2)
-		i2c_base = (struct i2c *)I2C_BASE3;
-	else
+	switch (bus) {
+		case 0:
+			i2c_base = (struct i2c *)I2C_BASE1;
+			break;
+		case 1:
+			i2c_base = (struct i2c *)I2C_BASE2;
+			break;
+#if I2C_BUS_MAX >= 3
+		case 2:
+			i2c_base = (struct i2c *)I2C_BASE3;
+			break;
 #endif
-	if (bus == 1)
-		i2c_base = (struct i2c *)I2C_BASE2;
-	else
-		i2c_base = (struct i2c *)I2C_BASE1;
+#if I2C_BUS_MAX >= 4
+		case 3:
+			i2c_base = (struct i2c *)I2C_BASE4;
+			break;
+#endif
+		default:
+			printf("Bad bus: %d\n", bus);
+			return -1;
+	}
 
 	current_bus = bus;
 
