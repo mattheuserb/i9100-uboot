@@ -292,7 +292,7 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 	
 	tuna_bootmode = (voldown << 1) | volup;
 
-	if (tuna_bootmode == BOOTMODE_UNKNOWN) {
+	if (tuna_bootmode == BOOTMODE_NORMAL) {
 		tuna_check_bootflag();
 	}
 
@@ -303,7 +303,7 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 #endif
 
 	//reset bootmode flag to avoid getting stuck in the boot loop
-	if (tuna_bootmode != BOOTMODE_NORMAL) {
+	if (tuna_bootmode == BOOTMODE_RECOVERY || tuna_bootmode == BOOTMODE_USBDEBUG) {
 		writel(REBOOT_FLAG_NORMAL, SAMSUNG_BOOTFLAG_ADDR);
 	}
 
