@@ -304,7 +304,7 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 
 	//reset bootmode flag to avoid getting stuck in the boot loop
 	if (tuna_bootmode != BOOTMODE_NORMAL) {
-		writel(BOOTMODE_NORMAL, SAMSUNG_BOOTFLAG_ADDR);
+		writel(REBOOT_FLAG_NORMAL, SAMSUNG_BOOTFLAG_ADDR);
 	}
 
 	setenv("tuna_bootmode_val", simple_itoa(tuna_bootmode));
