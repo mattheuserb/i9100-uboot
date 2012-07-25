@@ -292,7 +292,7 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 	
 	tuna_bootmode = (voldown << 1) | volup;
 
-	if (tuna_bootmode == BOOTMODE_NORMAL) {
+	if (tuna_bootmode == BOOTMODE_UNKNOWN) {
 		tuna_check_bootflag();
 	}
 
@@ -301,6 +301,11 @@ int do_tuna_get_bootmode(cmd_tbl_t *cmdtp, int flag,
 		twl6030_system_shutdown();
 	}
 #endif
+
+	//reset bootmode flag to avoid getting stuck in the boot loop
+	if (tuna_bootmode != BOOTMODE_NORMAL) {
+		writel(BOOTMODE_NORMAL, SAMSUNG_BOOTFLAG_ADDR);
+	}
 
 	setenv("tuna_bootmode_val", simple_itoa(tuna_bootmode));
 	return 0;
@@ -362,6 +367,8 @@ int board_init(void)
 	tuna_set_led(5);
 
 	tuna_check_bootflag();
+
+	udc_init();
 
 	return 0;
 }
